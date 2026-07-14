@@ -1,0 +1,51 @@
+.term-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.term-row p {
+  flex: 1;
+  margin: 0;
+}
+
+.term-icon {
+  color: #f59e0b;
+  font-size: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-warning {
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.btn-warning:hover {
+  background-color: #d97706;
+  border-color: #d97706;
+}
+
+.btn-outline-warning:hover {
+  color: #fff;
+}
+/* .upload-box {
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  padding: 20px;
+} */
+ .upload-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 2px dashed #bdbdbd;
+  border-radius: 8px;
+  cursor: pointer;
+  background: white;
+  color: #555;
+}
+
+.upload-btn:hover {
+  border-color: #f4a100;
+  color: #f4a100;
+}
