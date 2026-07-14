@@ -1,0 +1,41 @@
+.custom-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.custom-btn:hover {
+  background: #fff7ed;
+  border-color: #f59e0b;
+}
+
+.custom-btn svg {
+  color: #f59e0b;
+  font-size: 18px;
+}
+.card {
+  background: #fff;
+}
+
+.card .form-control {
+  text-align: center;
+  border-radius: 6px;
+}
+
+.card .input-group-text {
+  background: #fff;
+  font-weight: 600;
+}
+
+.card span {
+  font-size: 15px;
+}
