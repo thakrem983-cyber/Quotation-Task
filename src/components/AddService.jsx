@@ -1,17 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import "./AddService.css";
-import { useNavigate } from "react-router-dom";
+3;
 
 function AddService({ closeModal }) {
-  const navigate = useNavigate();
-
-  const [showPage, setShowPage] = useState(true);
-
-  if (!showPage) {
-    return null;
-  }
-
   const [serviceData, setServiceData] = useState({
     serviceName: "",
     qty: "1",
@@ -25,6 +17,10 @@ function AddService({ closeModal }) {
       ...serviceData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleCancel = () => {
+    closeModal();
   };
 
   const handleAdd = () => {
@@ -70,9 +66,7 @@ function AddService({ closeModal }) {
         <div className="service-title">
           <h3>Add Service</h3>
 
-          <button className="close-icon" onClick={() => setShowPage(false)}>
-            ×
-          </button>
+          <button className="close-btn" onClick={closeModal}>×</button>
         </div>
 
         <div className="service-form">
@@ -133,10 +127,7 @@ function AddService({ closeModal }) {
         </div>
 
         <div className="service-buttons">
-          <button
-            className="cancel-btn"
-            onClick={() => navigate("/add-tanky-product")}
-          >
+          <button className="cancel-btn" onClick={handleCancel}>
             Cancel
           </button>
 
