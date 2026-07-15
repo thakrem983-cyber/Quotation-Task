@@ -10,20 +10,27 @@ body {
 }
 
 .modal {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 9999;
 }
 
 .modal-box {
-  width: 70%;
-  height: 90%;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
@@ -31,23 +38,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 10px;
-  padding-left: 25px;
+  padding: 18px 25px;
   border-bottom: 1px solid #e5e5e5;
   background-color: #f7f8fc;
 }
 
 .header h3 {
-  font-size: 20px;
-  color: #333;
+  font-size: 22px;
+  font-weight: 600;
+  color: #222;
 }
 
 .close-btn {
   border: none;
-  background: none;
-  font-size: 22px;
+  background: transparent;
+  font-size: 24px;
   cursor: pointer;
-  color: #666;
+  color: #777;
 }
 
 .top-section {
@@ -97,7 +104,7 @@ body {
 }
 
 .table-container {
-  max-height: 380px;
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -114,15 +121,12 @@ body {
   border-collapse: collapse;
 }
 
-.product-table thead {
+.product-table thead th {
+  padding: 15px;
+  position: sticky;
+  top: 0;
   background: #f7f8fc;
-}
-
-.product-table th {
-  padding: 10px;
-  text-align: left;
-  font-size: 13px;
-  color: #666;
+  z-index: 5;
 }
 
 .product-table td {
@@ -164,16 +168,27 @@ body {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 20px;
-  margin: 20px 0px;
+  padding: 18px 25px;
   border-top: 1px solid #eee;
+  background: #fff;
 }
 
-button {
-  background-color: orange;
-  color: white;
-  border: orange;
-  border-radius: 4px;
+.footer button {
   width: 100px;
-  padding: 10px 10px;
+  height: 40px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.footer button:first-child {
+  background: white;
+  color: orange;
+  border: 1px solid orange;
+}
+
+.footer button:last-child {
+  background: orange;
+  color: white;
+  border: none;
 }

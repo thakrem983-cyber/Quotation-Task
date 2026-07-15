@@ -34,13 +34,10 @@
   margin: 0;
 }
 
-.close-icon {
-  border: none;
-  background: none;
+.close-btn {
   font-size: 28px;
   color: #777;
   cursor: pointer;
-  margin-right: -35px;
 }
 
 .service-form {
