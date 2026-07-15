@@ -2,9 +2,8 @@ import { useState } from "react";
 import "./AddProductItems.css";
 import { FaSearch } from "react-icons/fa";
 
-function AddProductItems() {
+function AddProductItems({ closeModal }) {
   const [category, setCategory] = useState("");
-  const [isOpen, setIsOpen] = useState(true);
   const [search, setSearch] = useState("");
 
   const [selectAll, setSelectAll] = useState(false);
@@ -51,18 +50,13 @@ function AddProductItems() {
       product.category.toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (!isOpen) {
-    return null;
-  }
-
   const handleCancel = () => {
-    alert("Cancel Successfully");
-    setIsOpen(false);
+    closeModal();
   };
 
   const handleAdd = () => {
     alert("Product Added Successfully");
-    setIsOpen(false);
+    closeModal();
   };
 
   return (
@@ -70,7 +64,7 @@ function AddProductItems() {
       <div className="modal-box">
         <div className="header">
           <h3>Add product items</h3>
-          <button className="close-btn" onClick={() => setIsOpen(false)}>
+          <button className="close-btn" onClick={closeModal}>
             ✕
           </button>
         </div>
@@ -405,5 +399,4 @@ function AddProductItems() {
     </div>
   );
 }
-
 export default AddProductItems;
