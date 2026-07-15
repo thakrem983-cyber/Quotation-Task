@@ -1,5 +1,3 @@
-
-
 import ProductTable from "./ProductTable";
 import { FaPlusCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
