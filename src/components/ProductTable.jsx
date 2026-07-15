@@ -254,35 +254,28 @@ function ProductTable({
 
                 <td>₹{product.amount.toFixed(2)}</td>
 
+             
                 <td>
-                  {!isView &&
-                    (product.isEditing ? (
-                      <button
-                        className="btn btn-warning btn-sm rounded-3 text-white"
-                        onClick={() => saveProduct(product.id)}
-                      >
-                        Save
-                      </button>
-                    ) : (
-                      <div className="d-flex justify-content-center gap-3">
-                        <FaEye
-                          className="text-secondary"
-                          style={{ cursor: "pointer" }}
-                        />
+                  {!isView && (
+                    <div className="d-flex justify-content-center gap-3">
+                      <FaEye
+                        className="text-secondary"
+                        style={{ cursor: "pointer" }}
+                      />
 
-                        <FaEdit
-                          className="text-warning"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => editProduct(product.id)}
-                        />
+                      <FaEdit
+                        className="text-warning"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => editProduct(product.id)}
+                      />
 
-                        <FaTrash
-                          className="text-danger"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => deleteProduct(product.id)}
-                        />
-                      </div>
-                    ))}
+                      <FaTrash
+                        className="text-danger"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => deleteProduct(product.id)}
+                      />
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
