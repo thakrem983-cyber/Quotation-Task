@@ -140,10 +140,10 @@ function ProductSection({
         return false;
       }
 
-      if (product.isEditing) {
-        alert("Please save product details first");
-        return false;
-      }
+      // if (product.isEditing) {
+      //   alert("Please save product details first");
+      //   return false;
+      // }
     }
 
     return true;
