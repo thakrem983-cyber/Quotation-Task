@@ -1,7 +1,5 @@
-import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import "./AddService.css";
-3;
 
 function AddService({ closeModal }) {
   const [serviceData, setServiceData] = useState({
@@ -11,6 +9,8 @@ function AddService({ closeModal }) {
     unit: "Square Yards",
     description: "",
   });
+
+  const [services, setServices] = useState([]);
 
   const handleChange = (e) => {
     setServiceData({
@@ -29,35 +29,30 @@ function AddService({ closeModal }) {
       return;
     }
 
-    console.log(serviceData);
+    const newService = {
+      id: Date.now(),
+      serviceName: serviceData.serviceName,
+      qty: serviceData.qty,
+      price: serviceData.price,
+      unit: serviceData.unit,
+      description: serviceData.description,
+    };
+
+    setServices([...services, newService]);
+
+    console.log(newService);
 
     alert("Service Added Successfully");
 
+    setServiceData({
+      serviceName: "",
+      qty: "1",
+      price: "",
+      unit: "Square Yards",
+      description: "",
+    });
+
     closeModal();
-
-    const [services, setServices] = useState([]);
-    const [serviceName, setServiceName] = useState("");
-    const [price, setPrice] = useState("");
-
-    const handleAdd = () => {
-      if (!serviceName || !price) {
-        alert("Please fill all fields");
-        return;
-      }
-
-      const newService = {
-        id: Date.now(),
-        serviceName,
-        price,
-      };
-
-      setServices([...services, newService]);
-
-      setServiceName("");
-      setPrice("");
-
-      alert("Service added successfully");
-    };
   };
 
   return (
@@ -66,7 +61,9 @@ function AddService({ closeModal }) {
         <div className="service-title">
           <h3>Add Service</h3>
 
-          <button className="close-btn" onClick={closeModal}>×</button>
+          <button className="close-btn" onClick={closeModal}>
+            ×
+          </button>
         </div>
 
         <div className="service-form">

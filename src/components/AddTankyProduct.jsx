@@ -1,6 +1,5 @@
-import { Category } from "@mui/icons-material";
 import "./AddTankyProduct.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 
 function AddTankyProduct({ closeModal, openAddService }) {
