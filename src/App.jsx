@@ -10,6 +10,7 @@ import ProductSection from "./components/ProductSection";
 import TermsSection from "./components/Term";
 import "@fontsource/poppins";
 import "./App.css";
+import api from "./api/api"; // <-- Ye API file import ho gayi
 
 function App() {
   const [validateQuotation, setValidateQuotation] = useState(null);
@@ -45,7 +46,8 @@ function App() {
   const [notes, setNotes] = useState("");
   const [validateProducts, setValidateProducts] = useState(null);
 
-  const handleSave = () => {
+  // handleSave ab async ho gaya hai API call ke liye
+  const handleSave = async () => {
     if (validateQuotation && !validateQuotation()) {
       alert("Please fill required details");
       return;
@@ -53,50 +55,67 @@ function App() {
     if (validateProducts && !validateProducts()) {
       return;
     }
-    const quotation = {
-      formData,
-      products,
-      summary,
-      notes,
+
+ const payloadForBackend = {
+      quotationType: formData.quotationType,
+      clientName: formData.clientName, 
+      subject: formData.subject,
+      products: products, 
+      discount: summary.discount,
+      cgst: summary.cgst,
+      sgst: summary.sgst,
+      other: summary.other,
+      notes: notes
     };
 
-    console.log(quotation);
+    console.log("Sending data to backend:", payloadForBackend);
 
-    alert("Quotation Saved Successfully!");
+    try {
+      // Backend ko data bhej  ta haaii ye
+      const response = await api.post("/quotations", payloadForBackend);
 
-    setFormData({
-      quotationType: "GST",
-      quotationNumber: "",
-      quotationName: "",
-      date: "",
-      title: "MR",
-      clientName: "",
-      subject: "",
-    });
+      console.log("Backend response:", response.data);
+      alert("Quotation Saved Successfully in Database!");
 
-    setProducts([
-      {
-        id: 1,
-        productName: "",
-        code: "",
-        unit: "",
-        price: 0,
-        quantity: 1,
-        amount: 0,
-        image: null,
-        isEditing: true,
-      },
-    ]);
+      // Save hone ke baad form khali karta hai ye
+      setFormData({
+        quotationType: "GST",
+        quotationNumber: "",
+        quotationName: "",
+        date: "",
+        title: "MR",
+        clientName: "",
+        subject: "",
+      });
 
-    setSummary({
-      discount: 0,
-      cgst: 0,
-      sgst: 0,
-      other: 0,
-    });
+      setProducts([
+        {
+          id: 1,
+          productName: "",
+          code: "",
+          unit: "",
+          price: 0,
+          quantity: 1,
+          amount: 0,
+          image: null,
+          isEditing: true,
+        },
+      ]);
 
-    setNotes("");
+      setSummary({
+        discount: 0,
+        cgst: 0,
+        sgst: 0,
+        other: 0,
+      });
+
+      setNotes("");
+    } catch (error) {
+      console.error("Backend error:", error);
+      alert("Error saving quotation. Check console.");
+    }
   };
+
   const handleCancel = () => {
     const confirmCancel = window.confirm("Are you sure you want to cancel?");
 
@@ -135,6 +154,7 @@ function App() {
 
     setNotes("");
   };
+
   return (
     <Routes>
       <Route
