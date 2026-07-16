@@ -30,10 +30,8 @@ function ProductSection({
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const [selectionMode, setSelectionMode] = useState(null);
 
-  const [selectionMode, setSelectionMode] = useState(null); 
-
- 
   useEffect(() => {
     if (products.length === 0) {
       setSelectionMode(null);
@@ -198,8 +196,6 @@ function ProductSection({
         <div className="row">
           <div className="col-md-8">
             <div className="d-flex gap-2">
-              
-             
               <button
                 className="custom-btn"
                 onClick={() => {
@@ -209,15 +205,17 @@ function ProductSection({
                 disabled={isView || selectionMode === "tanky"}
                 style={{
                   opacity: isView || selectionMode === "tanky" ? 0.4 : 1,
-                  cursor: isView || selectionMode === "tanky" ? "not-allowed" : "pointer",
-                  transition: "opacity 0.3s ease"
+                  cursor:
+                    isView || selectionMode === "tanky"
+                      ? "not-allowed"
+                      : "pointer",
+                  transition: "opacity 0.3s ease",
                 }}
               >
                 <FaPlusCircle className="text-warning me-2" />
                 Add Product Items
               </button>
 
-             
               <button
                 className="custom-btn"
                 onClick={() => {
@@ -227,15 +225,17 @@ function ProductSection({
                 disabled={isView || selectionMode === "tanky"}
                 style={{
                   opacity: isView || selectionMode === "tanky" ? 0.4 : 1,
-                  cursor: isView || selectionMode === "tanky" ? "not-allowed" : "pointer",
-                  transition: "opacity 0.3s ease"
+                  cursor:
+                    isView || selectionMode === "tanky"
+                      ? "not-allowed"
+                      : "pointer",
+                  transition: "opacity 0.3s ease",
                 }}
               >
                 <FaPlusCircle className="text-warning me-2" />
                 Custom Service
               </button>
 
-              
               <button
                 className="custom-btn"
                 onClick={() => {
@@ -245,8 +245,11 @@ function ProductSection({
                 disabled={isView || selectionMode === "regular"}
                 style={{
                   opacity: isView || selectionMode === "regular" ? 0.4 : 1,
-                  cursor: isView || selectionMode === "regular" ? "not-allowed" : "pointer",
-                  transition: "opacity 0.3s ease"
+                  cursor:
+                    isView || selectionMode === "regular"
+                      ? "not-allowed"
+                      : "pointer",
+                  transition: "opacity 0.3s ease",
                 }}
               >
                 <FaPlusCircle className="text-warning me-2" />
@@ -375,22 +378,26 @@ function ProductSection({
       {showAddProductModal && (
         <AddProductItems closeModal={() => setShowAddProductModal(false)} />
       )}
+
       {showCustomerServiceModal && (
         <CustomerService
           closeModal={() => setShowCustomerServiceModal(false)}
         />
       )}
+
       {showAddServiceModal && (
         <AddService closeModal={() => setShowAddServiceModal(false)} />
       )}
+
       {showAddTankyProductModal && (
         <AddTankyProduct
           closeModal={() => setShowAddTankyProductModal(false)}
-          openAddService={() => {
-            setShowAddTankyProductModal(false);
-            setShowAddServiceModal(true);
-          }}
+          openAddService={() => setShowAddServiceModal(true)}
         />
+      )}
+
+      {showAddServiceModal && (
+        <AddService closeModal={() => setShowAddServiceModal(false)} />
       )}
     </>
   );
