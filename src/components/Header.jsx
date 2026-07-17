@@ -8,7 +8,7 @@ function Header() {
 
         <div className="col-md-7">
           <h1 >
-            <span className="text-warning" style={{fontSize:"50px"}}>Milestone</span>
+            <span className="text-warning" style={{fontSize:"45px", fontWeight:"bold"}}>Milestone</span>
             <span className="text-dark" style={{fontSize:"50px"}}> Enterprises</span>
           </h1>
         </div>

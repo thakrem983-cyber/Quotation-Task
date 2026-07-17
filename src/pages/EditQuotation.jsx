@@ -6,6 +6,7 @@ import TermsSection from "../components/Term";
 import "@fontsource/poppins";
 import "../App.css";
 
+
 function EditQuotation({
   formData,
   setFormData,
@@ -25,6 +26,7 @@ function EditQuotation({
       <Header />
 
       <QuotationForm
+        heading="Edit Quotation"
         formData={formData}
         setFormData={setFormData}
         setValidateQuotation={setValidateQuotation}

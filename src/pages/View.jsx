@@ -15,6 +15,7 @@ function View({
       <Header />
 
       <QuotationForm
+        heading="View Quotation"
         formData={formData}
         isView={true}
       />

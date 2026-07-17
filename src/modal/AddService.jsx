@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./AddService.css";
 
-function AddService({ closeModal }) {
+function AddService({ closeModal, products: mainProducts, setProducts }) {
   const [serviceData, setServiceData] = useState({
     serviceName: "",
     qty: "1",
@@ -9,8 +9,6 @@ function AddService({ closeModal }) {
     unit: "Square Yards",
     description: "",
   });
-
-  const [services, setServices] = useState([]);
 
   const handleChange = (e) => {
     setServiceData({
@@ -24,37 +22,21 @@ function AddService({ closeModal }) {
   };
 
   const handleAdd = () => {
-    if (serviceData.serviceName === "" || serviceData.price === "") {
-      alert("Please fill required fields");
-      return;
-    }
-
     const newService = {
       id: Date.now(),
-      serviceName: serviceData.serviceName,
-      qty: serviceData.qty,
-      price: serviceData.price,
+      productName: serviceData.serviceName,
+      code: "SERVICE",
       unit: serviceData.unit,
-      description: serviceData.description,
+      price: Number(serviceData.price),
+      quantity: Number(serviceData.qty),
+      amount: Number(serviceData.price) * Number(serviceData.qty),
+      isEditing: false,
     };
 
-    setServices([...services, newService]);
-
-    console.log(newService);
-
-    alert("Service Added Successfully");
-
-    setServiceData({
-      serviceName: "",
-      qty: "1",
-      price: "",
-      unit: "Square Yards",
-      description: "",
-    });
+    setProducts([...mainProducts, newService]);
 
     closeModal();
   };
-
   return (
     <div className="service-overlay">
       <div className="service-box">

@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import "./index.css"
+import "./index.css";
+import EditQuotation from "./EditQuotation";
 
 
 import {
@@ -213,9 +214,9 @@ function Quotation() {
                                     </Dropdown>
                                 </td>
                                 <td className="action-icons">
-                                    <FaEye onClick={() => handleView(item.id)} />
+                                    <FaEye onClick={() => navigate("/view")}  />
                                     <FaDownload onClick={() => handleDownload(item.id)} />
-                                    <FaEdit onClick={() => handleEdit(item.id)} />
+                                    <FaEdit onClick={() => navigate("/editquotation")} />
                                     <FaShareAlt onClick={() => handleShare(item.id)} />
                                     <FaTrash onClick={() => handleDelete(item.id)} />
                                     <FaPrint onClick={() => handlePrint(item.id)} />
