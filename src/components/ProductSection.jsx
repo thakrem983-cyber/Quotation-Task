@@ -2,13 +2,13 @@ import ProductTable from "./ProductTable";
 import { FaPlusCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import "./Section.css";
-import EditProductModal from "./EditProductModal";
+import EditProductModal from "../modal/EditProductModal";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import AddProductItems from "./AddProductItems";
-import CustomerService from "./CustomerService";
-import AddTankyProduct from "./AddTankyProduct";
-import AddService from "./AddService";
+import AddProductItems from "../modal/AddProductItems";
+import CustomerService from "../modal/CustomerService";
+import AddTankyProduct from "../modal/AddTankyProduct";
+import AddService from "../modal/AddService";
 
 function ProductSection({
   products,
@@ -376,28 +376,36 @@ function ProductSection({
         </div>
       </div>
       {showAddProductModal && (
-        <AddProductItems closeModal={() => setShowAddProductModal(false)} />
+        <AddProductItems
+          closeModal={() => setShowAddProductModal(false)}
+          products={products}
+          setProducts={setProducts}
+        />
       )}
 
       {showCustomerServiceModal && (
         <CustomerService
           closeModal={() => setShowCustomerServiceModal(false)}
+          products={products}
+          setProducts={setProducts}
         />
-      )}
-
-      {showAddServiceModal && (
-        <AddService closeModal={() => setShowAddServiceModal(false)} />
       )}
 
       {showAddTankyProductModal && (
         <AddTankyProduct
           closeModal={() => setShowAddTankyProductModal(false)}
           openAddService={() => setShowAddServiceModal(true)}
+          products={products}
+          setProducts={setProducts}
         />
       )}
 
       {showAddServiceModal && (
-        <AddService closeModal={() => setShowAddServiceModal(false)} />
+        <AddService
+          closeModal={() => setShowAddServiceModal(false)}
+          products={products}
+          setProducts={setProducts}
+        />
       )}
     </>
   );

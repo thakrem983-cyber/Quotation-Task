@@ -12,6 +12,18 @@ import "@fontsource/poppins";
 import "./App.css";
 import api from "./api/api"; // <-- Ye API file import ho gayi
 
+//mansi
+import AddProductItems from "./modal/AddProductItems";
+import ApproveQuotation from "./modal/ApproveQuotation";
+import CustomerService from "./modal/CustomerService";
+import AddTankyProduct from "./modal/AddTankyProduct";
+import AddService from "./modal/AddService";
+
+//chaitali
+import Quotation from "./pages/Quotation";
+import AddQuot from "./pages/AddQuot";
+import QuotationTemplate from "./pages/QuotationTemplate";
+
 function App() {
   const [validateQuotation, setValidateQuotation] = useState(null);
 
@@ -56,11 +68,11 @@ function App() {
       return;
     }
 
- const payloadForBackend = {
+    const payloadForBackend = {
       quotationType: formData.quotationType,
-      clientName: formData.clientName, 
+      clientName: formData.clientName,
       subject: formData.subject,
-      products: products, 
+      products: products,
       discount: summary.discount,
       cgst: summary.cgst,
       sgst: summary.sgst,
@@ -157,8 +169,28 @@ function App() {
 
   return (
     <Routes>
+
+      //chaitali
+
+      <Route path="/" element={<Quotation />} />
+      <Route path="/addquotation" element={<AddQuot formData={formData}
+            setFormData={setFormData}
+            products={products}
+            setProducts={setProducts}
+            summary={summary}
+            setSummary={setSummary}
+            notes={notes}
+            setNotes={setNotes}
+            handleSave={handleSave}
+            handleCancel={handleCancel}
+            setValidateQuotation={setValidateQuotation}
+            setValidateProducts={setValidateProducts}
+          /> } />
+      <Route path="/quotation-template" element={<QuotationTemplate />} />
+
+        //swapnil
       <Route
-        path="/"
+        path="/editquotation"
         element={
           <EditQuotation
             formData={formData}
@@ -189,6 +221,13 @@ function App() {
           />
         }
       />
+      //mansi
+      <Route path="/addproduct" element={<AddProductItems />} />
+      <Route path="/approve-quotation" element={<ApproveQuotation />} />
+      <Route path="/customer-service" element={<CustomerService />} />
+      <Route path="/add-tanky-product" element={<AddTankyProduct />} />
+      <Route path="/add-service" element={<AddService />} />
+
     </Routes>
   );
 }

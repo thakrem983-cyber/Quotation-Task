@@ -2,12 +2,17 @@ import "./AddTankyProduct.css";
 import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 
-function AddTankyProduct({ closeModal, openAddService }) {
+function AddTankyProduct({
+  closeModal,
+  openAddService,
+  products: mainProducts,
+  setProducts,
+}) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [selectAll, setSelectAll] = useState(false);
 
-  const [products, setProducts] = useState([
+  const [tankyProducts, setTankyProducts] = useState([
     {
       id: 1,
       image: "https://via.placeholder.com/35",
@@ -53,16 +58,16 @@ function AddTankyProduct({ closeModal, openAddService }) {
 
     setSelectAll(checked);
 
-    const updatedProducts = products.map((item) => ({
+    const updatedProducts = tankyProducts.map((item) => ({
       ...item,
       checked: checked,
     }));
 
-    setProducts(updatedProducts);
+    setTankyProducts(updatedProducts);
   };
 
   const handleQuantity = (id, value) => {
-    const updatedProducts = products.map((item) => {
+    const updatedProducts = tankyProducts.map((item) => {
       if (item.id === id) {
         return {
           ...item,
@@ -72,7 +77,7 @@ function AddTankyProduct({ closeModal, openAddService }) {
       return item;
     });
 
-    setProducts(updatedProducts);
+    setTankyProducts(updatedProducts);
   };
 
   const handleCancel = () => {
@@ -80,16 +85,30 @@ function AddTankyProduct({ closeModal, openAddService }) {
   };
 
   const handleAdd = () => {
-    alert("Added Successfully");
+    const selectedProducts = tankyProducts
+      .filter((item) => item.checked && Number(item.quantity) > 0)
+      .map((item) => ({
+        id: Date.now() + item.id,
+        productName: item.name,
+        code: "TANKY",
+        unit: item.unit,
+        price: 0,
+        quantity: Number(item.quantity),
+        amount: 0,
+        isEditing: false,
+      }));
+
+    setProducts([...mainProducts, ...selectedProducts]);
+
     closeModal();
   };
 
   const handleAddService = () => {
-  openAddService();
-};
+    openAddService();
+  };
 
   const handleUnit = (id, value) => {
-    const updatedProducts = products.map((item) => {
+    const updatedProducts = tankyProducts.map((item) => {
       if (item.id === id) {
         return {
           ...item,
@@ -100,10 +119,10 @@ function AddTankyProduct({ closeModal, openAddService }) {
       return item;
     });
 
-    setProducts(updatedProducts);
+    setTankyProducts(updatedProducts);
   };
 
-  const filteredProducts = products.filter((item) => {
+  const filteredProducts = tankyProducts.filter((item) => {
     const searchMatch = item.name.toLowerCase().includes(search.toLowerCase());
 
     const categoryMatch = category === "" || item.category === category;
@@ -173,7 +192,7 @@ function AddTankyProduct({ closeModal, openAddService }) {
                         type="checkbox"
                         checked={item.checked}
                         onChange={() => {
-                          const updatedProducts = products.map((product) =>
+                          const updatedProducts = tankyroducts.map((product) =>
                             product.id === item.id
                               ? {
                                   ...product,
@@ -182,7 +201,7 @@ function AddTankyProduct({ closeModal, openAddService }) {
                               : product,
                           );
 
-                          setProducts(updatedProducts);
+                          setTankyProducts(updatedProducts);
 
                           setSelectAll(
                             updatedProducts.every((product) => product.checked),

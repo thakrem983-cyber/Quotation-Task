@@ -2,7 +2,8 @@ import { useState } from "react";
 import "./AddProductItems.css";
 import { FaSearch } from "react-icons/fa";
 
-function AddProductItems({ closeModal }) {
+// function AddProductItems({ closeModal }) {
+function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
   const [category, setCategory] = useState("");
   const [search, setSearch] = useState("");
 
@@ -43,6 +44,14 @@ function AddProductItems({ closeModal }) {
     },
   ];
 
+  const [quantities, setQuantities] = useState({
+    row1: 0,
+    row2: 0,
+    row3: 0,
+    row4: 0,
+    row5: 0,
+  });
+
   const filteredProducts = products.filter(
     (product) =>
       product.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -55,7 +64,75 @@ function AddProductItems({ closeModal }) {
   };
 
   const handleAdd = () => {
-    alert("Product Added Successfully");
+    const newProducts = [];
+
+    if (checkedRows.row1 && Number(quantities.row1) > 0) {
+      newProducts.push({
+        id: Date.now() + 1,
+        productName: "Test Product45",
+        code: "DH00012",
+        unit: "bags",
+        price: 5000,
+        quantity: Number(quantities.row1),
+        amount: 5000 * Number(quantities.row1),
+        isEditing: false,
+      });
+    }
+
+    if (checkedRows.row2 && Number(quantities.row2) > 0) {
+      newProducts.push({
+        id: Date.now() + 2,
+        productName: "Roofing materials",
+        code: "DH0001",
+        unit: "kilogram (kg)",
+        price: 100000,
+        quantity: Number(quantities.row2),
+        amount: 100000 * Number(quantities.row2),
+        isEditing: false,
+      });
+    }
+
+    if (checkedRows.row3 && Number(quantities.row3) > 0) {
+      newProducts.push({
+        id: Date.now() + 3,
+        productName: "Test Product23",
+        code: "PROD046",
+        unit: "bags",
+        price: 20000,
+        quantity: Number(quantities.row3),
+        amount: 20000 * Number(quantities.row3),
+        isEditing: false,
+      });
+    }
+
+    if (checkedRows.row4 && Number(quantities.row4) > 0) {
+      newProducts.push({
+        id: Date.now() + 4,
+        productName: "Test Product",
+        code: "PROD048",
+        unit: "Square Yards",
+        price: 20000,
+        quantity: Number(quantities.row4),
+        amount: 20000 * Number(quantities.row4),
+        isEditing: false,
+      });
+    }
+
+    if (checkedRows.row5 && Number(quantities.row5) > 0) {
+      newProducts.push({
+        id: Date.now() + 5,
+        productName: "Product1",
+        code: "DH0005",
+        unit: "bags",
+        price: 1000,
+        quantity: Number(quantities.row5),
+        amount: 1000 * Number(quantities.row5),
+        isEditing: false,
+      });
+    }
+
+    setProducts([...mainProducts, ...newProducts]);
+
     closeModal();
   };
 
@@ -174,8 +251,14 @@ function AddProductItems({ closeModal }) {
                       <input
                         type="number"
                         className="qty-input"
-                        defaultValue="0"
+                        value={quantities.row1}
                         min="0"
+                        onChange={(e) =>
+                          setQuantities({
+                            ...quantities,
+                            row1: e.target.value,
+                          })
+                        }
                       />
                     </td>
                   </tr>
@@ -227,8 +310,14 @@ function AddProductItems({ closeModal }) {
                       <input
                         type="number"
                         className="qty-input"
-                        defaultValue="0"
+                        value={quantities.row2}
                         min="0"
+                        onChange={(e) =>
+                          setQuantities({
+                            ...quantities,
+                            row2: e.target.value,
+                          })
+                        }
                       />
                     </td>
                   </tr>
@@ -278,8 +367,14 @@ function AddProductItems({ closeModal }) {
                       <input
                         type="number"
                         className="qty-input"
-                        defaultValue="0"
+                        value={quantities.row3}
                         min="0"
+                        onChange={(e) =>
+                          setQuantities({
+                            ...quantities,
+                            row3: e.target.value,
+                          })
+                        }
                       />
                     </td>
                   </tr>
@@ -330,8 +425,14 @@ function AddProductItems({ closeModal }) {
                       <input
                         type="number"
                         className="qty-input"
-                        defaultValue="0"
+                        value={quantities.row4}
                         min="0"
+                        onChange={(e) =>
+                          setQuantities({
+                            ...quantities,
+                            row4: e.target.value,
+                          })
+                        }
                       />
                     </td>
                   </tr>
@@ -381,8 +482,14 @@ function AddProductItems({ closeModal }) {
                       <input
                         type="number"
                         className="qty-input"
-                        defaultValue="0"
+                        value={quantities.row5}
                         min="0"
+                        onChange={(e) =>
+                          setQuantities({
+                            ...quantities,
+                            row5: e.target.value,
+                          })
+                        }
                       />
                     </td>
                   </tr>

@@ -1,0 +1,160 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+.delete-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.delete-modal {
+  width: 720px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  animation: popup 0.25s ease;
+}
+
+@keyframes popup {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+.delete-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 28px;
+  border-bottom: 1px solid #ececec;
+  background-color: #f7f6f6;
+}
+
+.delete-header h2 {
+  font-size: 34px;
+  font-weight: 600;
+  color: #222;
+}
+
+.Number{
+    border: 1px solid rgb(227, 227, 227);
+    border-radius: 6px;
+    margin-right: 300px;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #f7f6f6;
+}
+
+.close-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 28px;
+  color: #444;
+  transition: 0.2s;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+.delete-body {
+  padding: 55px 30px 85px;
+}
+
+.delete-text {
+  font-size: 28px;
+  color: #666;
+  margin-bottom: 38px;
+  line-height: 1.5;
+}
+
+.delete-body h3 {
+  font-size: 40px;
+  font-weight: 600;
+  color: #2b2b2b;
+  margin-bottom: 30px;
+}
+
+.delete-warning {
+  font-size: 26px;
+  color: #8f8f8f;
+}
+
+
+.delete-footer {
+  display: flex;
+  gap: 20px;
+  padding: 0 30px 28px;
+}
+
+.cancel-btn,
+.delete-btn {
+  min-width: 140px;
+  height: 52px;
+  border: none;
+  border-radius: 8px;
+  background: #f5a24d;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cancel-btn:hover,
+.delete-btn:hover {
+  background: #ea9136;
+}
+
+
+@media (max-width: 768px) {
+  .delete-modal {
+    width: 92%;
+  }
+
+  .delete-header h2 {
+    font-size: 24px;
+  }
+
+  .delete-text {
+    font-size: 18px;
+  }
+
+  .delete-body h3 {
+    font-size: 28px;
+  }
+
+  .delete-warning {
+    font-size: 17px;
+  }
+
+  .delete-footer {
+    flex-direction: column;
+  }
+
+  .cancel-btn,
+  .delete-btn {
+    width: 100%;
+  }
+}

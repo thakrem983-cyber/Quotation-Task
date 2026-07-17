@@ -9,6 +9,8 @@ function TermsSection({
   handleSave,
   handleCancel,
   isView = false,
+  saveButtonText = "Save",   // Default "Save" rahega agar koi pass nahi karega
+  cancelButtonText = "Cancel" // Default "Cancel" rahega
 }) {
   const [files, setFiles] = useState([]);
 
@@ -38,6 +40,7 @@ function TermsSection({
   const removeFile = (index) => {
     setFiles(files.filter((_, i) => i !== index));
   };
+  
   const [terms, setTerms] = useState([
     "In case of any damage during transit or travel, Milestone Enterprises will not be held responsible.",
     "Supply will be made within 2 to 3 Weeks from the date of confirmed PO and full payment.",
@@ -184,20 +187,22 @@ function TermsSection({
               </label>
             </div>
 
+            {/* Yahan humne text ko dynamic kar diya */}
             <button
               className="btn btn-warning text-white rounded-3 px-4 py-2"
               onClick={handleSave}
               disabled={isView}
             >
-              Save
+              {saveButtonText}
             </button>
 
+            {/* Yahan bhi text dynamic ho gaya */}
             <button
               className="btn btn-outline-warning rounded-3 px-4 py-2"
               onClick={handleCancel}
               disabled={isView}
             >
-              Cancel
+              {cancelButtonText}
             </button>
           </div>
         </div>
