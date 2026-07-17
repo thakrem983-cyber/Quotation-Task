@@ -1,0 +1,106 @@
+ *{
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+} 
+.table thead th{
+    color: rgb(89, 89, 124);
+}
+
+.btn-light{
+    background:#f8f9fc;
+    border:none;
+    padding:10px 18px;
+    border-radius:10px;
+    font-weight:500;
+}
+.btn-box{
+    display: flex;
+    height: 50px;
+    gap: 7px;
+    
+}
+.btn-box button{
+    font-size: 13px;
+}
+
+.card{
+    border-radius:12px;
+    background:#fbfbfd;
+}
+
+.input-group-text{
+    background:white;
+}
+
+.plusIcon{
+    color: orange;
+    font-size: 15px;
+}
+.edit-icon{
+    color: orange;
+    font-size: 20px;
+}
+.uploadBtn{
+    border:2px dashed grey;
+    padding:10px 20px;
+    border-radius: 8px;
+}
+.uploadBtn:hover{
+    background-color: grey;
+}
+.form-check-input{
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+.summary-row {
+    display: grid;
+    grid-template-columns: 140px 110px 120px;
+    align-items: center;
+    padding: 18px 20px;
+    border-bottom: 1px none #ececec;
+    gap: 15px;
+}
+
+.summary-title {
+    color: #555;
+    white-space: nowrap;
+}
+
+.summary-center {
+    display: flex;
+    justify-content: center;
+}
+
+.summary-value {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #222;
+}
+
+.summary-row .input-group {
+    width: 100%;
+}
+
+.summary-row .form-control {
+    text-align: center;
+    font-weight: 600;
+}
+
+.summary-row:hover {
+    background: #fafafa;
+}
+
+.card {
+    border-radius: 18px;
+}
