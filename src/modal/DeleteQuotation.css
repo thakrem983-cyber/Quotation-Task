@@ -108,8 +108,8 @@
   padding: 0 30px 28px;
 }
 
-.cancel-btn,
-.delete-btn {
+.d-cancel-btn,
+.d-delete-btn {
   min-width: 140px;
   height: 52px;
   border: none;
@@ -122,8 +122,8 @@
   transition: 0.2s;
 }
 
-.cancel-btn:hover,
-.delete-btn:hover {
+.d-cancel-btn:hover,
+.d-delete-btn:hover {
   background: #ea9136;
 }
 

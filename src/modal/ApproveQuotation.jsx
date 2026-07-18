@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./ApproveQuotation.css";
 
-function ApproveQuotation() {
+function ApproveQuotation({ closeModal, onApprove }) {
   const [paymentReceived, setPaymentReceived] = useState(null);
 
   // YES Form
@@ -12,37 +12,43 @@ function ApproveQuotation() {
   // NO Form
   const [expectedDate, setExpectedDate] = useState("");
   const [note, setNote] = useState("");
-  const [isOpen, setIsOpen] = useState(true);
+  // const [isOpen, setIsOpen] = useState(true);
   const [activeButton, setActiveButton] = useState("");
   
   const [selectedButton, setSelectedButton] = useState("");
   console.log(selectedButton);
-  const handleApprove = () => {};
-  const handleCancel = () => {};
+
+  const handleApprove = () => {
+  onApprove();
+  closeModal();
+};
+  const handleCancel = () => {
+  closeModal();
+};
   const handleFinance = () => {};
 
-  if (!isOpen) {
-    return null;
-  }
+  // if (!isOpen) {
+  //   return null;
+  // }
   return (
-    <div className="modal-overlay">
-      <div className="quotation-modal">
-        <div className="modal-header">
+    <div className="approve-modal-overlay">
+      <div className="approve-quotation-modal">
+        <div className="approve-modal-header">
           <h2>Approve Quotation #MECH202627-009</h2>
 
-          <button className="close-btn" onClick={() => setIsOpen(false)}>
+          <button className="approve-close-btn" onClick={closeModal}>
             ✕
           </button>
         </div>
 
-        <div className="modal-content">
-          <p className="description">
+        <div className="approve-modal-content">
+          <p className="approve-description">
             Please select whether the payment has been received.
           </p>
 
-          <div className="button-group">
+          <div className="approve-button-group">
             <button
-              className={paymentReceived === true ? "active-btn" : "normal-btn"}
+              className={paymentReceived === true ? "approve-active-btn" : "approve-normal-btn"}
               onClick={() => setPaymentReceived(true)}
             >
               YES
@@ -50,7 +56,7 @@ function ApproveQuotation() {
 
             <button
               className={
-                paymentReceived === false ? "active-btn" : "normal-btn"
+                paymentReceived === false ? "approve-active-btn" : "approve-normal-btn"
               }
               onClick={() => setPaymentReceived(false)}
             >
@@ -59,10 +65,10 @@ function ApproveQuotation() {
           </div>
 
           {paymentReceived !== null && (
-            <div className="container">
+            <div className="approve-container">
               {paymentReceived === true && (
-                <div className="payment-section">
-                  <div className="field-group">
+                <div className="approve-payment-section">
+                  <div className="approve-field-group">
                     <h3>Payment Details</h3>
                     <label>
                       Amount Details <span>*</span>
@@ -81,8 +87,8 @@ function ApproveQuotation() {
                     }}
                   />
 
-                  <div className="row">
-                    <div className="field-group">
+                  <div className="approve-row">
+                    <div className="approve-field-group">
                       <label>
                         Payment Mode <span>*</span>
                       </label>
@@ -103,7 +109,7 @@ function ApproveQuotation() {
                       </select>
                     </div>
 
-                    <div className="field-group">
+                    <div className="approve-field-group">
                       <label>
                         Paid To <span>*</span>
                       </label>
@@ -120,15 +126,15 @@ function ApproveQuotation() {
                     </div>
                   </div>
 
-                  <div className="note-box">
+                  <div className="approve-note-box">
                     <span>Note:</span> The payment will be recorded and added to
                     the client's finance.
                   </div>
 
-                  <div className="footer-buttons">
+                  <div className="approve-footer-buttons">
                     <button
-                      className={`approve-btn ${
-                        selectedButton === "approve" ? "selected-btn" : ""
+                      className={`approve-approve-btn ${
+                        selectedButton === "approve" ? "approve-selected-btn" : ""
                       }`}
                       onClick={() => {
                         setSelectedButton("approve");
@@ -139,8 +145,8 @@ function ApproveQuotation() {
                     </button>
 
                     <button
-                      className={`cancel-btn ${
-                        selectedButton === "cancel" ? "selected-btn" : ""
+                      className={`approve-cancel-btn ${
+                        selectedButton === "cancel" ? "approve-selected-btn" : ""
                       }`}
                       onClick={() => {
                         setSelectedButton("cancel");
@@ -152,8 +158,8 @@ function ApproveQuotation() {
                   </div>
 
                   <button
-                    className={`finance-btn ${
-                      selectedButton === "finance" ? "selected-btn" : ""
+                    className={`approve-finance-btn ${
+                      selectedButton === "finance" ? "approve-selected-btn" : ""
                     }`}
                     onClick={() => {
                       setSelectedButton("finance");
@@ -166,7 +172,7 @@ function ApproveQuotation() {
               )}
 
               {paymentReceived === false && (
-                <div className="payment-section">
+                <div className="approve-payment-section">
                   <h3>Expected Advance Date *</h3>
 
                   <input
@@ -184,10 +190,10 @@ function ApproveQuotation() {
                     onChange={(e) => setNote(e.target.value)}
                   />
 
-                  <div className="footer-buttons">
+                  <div className="approve-footer-buttons">
                     <button
-                      className={`approve-btn ${
-                        selectedButton === "approve" ? "selected-btn" : ""
+                      className={`approve-approve-btn ${
+                        selectedButton === "approve" ? "approve-selected-btn" : ""
                       }`}
                       onClick={() => {
                         setSelectedButton("approve");
@@ -198,8 +204,8 @@ function ApproveQuotation() {
                     </button>
 
                     <button
-                      className={`cancel-btn ${
-                        selectedButton === "cancel" ? "selected-btn" : ""
+                      className={`approve-cancel-btn ${
+                        selectedButton === "cancel" ? "approve-selected-btn" : ""
                       }`}
                       onClick={() => {
                         setSelectedButton("cancel");
@@ -211,8 +217,8 @@ function ApproveQuotation() {
                   </div>
 
                   <button
-                    className={`finance-btn ${
-                      selectedButton === "finance" ? "selected-btn" : ""
+                    className={`approve-finance-btn ${
+                      selectedButton === "finance" ? "approve-selected-btn" : ""
                     }`}
                     onClick={() => {
                       setSelectedButton("finance");
