@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // useEffect add kiya
 import { useNavigate } from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -6,6 +6,7 @@ import "./index.css";
 import EditQuotation from "./EditQuotation";
 import DeleteQuotation from "../modal/DeleteQuotation";
 import ApproveQuotation from "../modal/ApproveQuotation";
+import api from "../api/api"; // <-- APNI AXIOS WALI FILE YAHAN IMPORT KAR
 
 import {
   FaEye,
@@ -25,40 +26,49 @@ function Quotation() {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [approveId, setApproveId] = useState(null);
 
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "Mr. Rajesh Sahu",
-      quotation: "MECH202627-009",
-      date: "7/9/2026",
-      advance: "₹0.00",
-      total: "₹0.00",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      name: "Mr. ROX",
-      quotation: "ME202627-033",
-      date: "6/3/2026",
-      advance: "₹10,000.00",
-      total: "₹1,25,018.00",
-      status: "Approved",
-    },
-    {
-      id: 3,
-      name: "Ms. Tanuja",
-      quotation: "ME202627-032",
-      date: "5/29/2026",
-      advance: "₹1,180.00",
-      total: "₹1,18,018.00",
-      status: "Approved",
-    },
-  ]);
   const statusOptions = ["Pending", "Approved", "Rejected"];
   const [search, setSearch] = useState("");
   const [entries, setEntries] = useState(10);
   const [typeFilter, setTypeFilter] = useState("All");
   const [selectedUsers, setSelectedUsers] = useState([]);
+// 1. Users ko starting mein khali (empty array) rakhenge
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state add ki
+
+  // 2. Page load hote hi backend se data mangwane ke liye useEffect
+  useEffect(() => {
+    fetchQuotations();
+  }, []);
+
+  const fetchQuotations = async () => {
+    try {
+      // Backend ke '/api/quotations' route par GET request bhej rahe hain
+      const response = await api.get("/quotations");
+      
+      // Backend se jo data aaya (response.data.data array)
+      const backendData = response.data.data;
+
+      // 3. Backend ke data ko tere frontend wale format mein badal (map) rahe hain
+      const formattedData = backendData.map((item) => ({
+        id: item._id, // MongoDB humesha '_id' deta hai
+        name: item.clientName, // Tere backend mein ye clientName hai
+        quotation: item.quotationNumber,
+        date: new Date(item.createdAt).toLocaleDateString(), // Date ko format kiya
+        advance: item.amountReceived ? `₹${item.amountReceived}` : "₹0.00",
+        total: `₹${item.grandTotal.toFixed(2)}`,
+        status: item.status,
+        type: item.quotationType // Ye tere filter (Cash/GST) ke liye zaroori hai
+      }));
+
+      // 4. State mein data save kar diya
+      setUsers(formattedData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Data laane mein error aayi:", error);
+      setLoading(false);
+    }
+  }
+  
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
@@ -125,7 +135,7 @@ function Quotation() {
       <div className="quotation-card">
         <div className="quotation-header">
           <h1>Quotation</h1>
-          <button className="quot-add-btn" onClick={() => navigate("/addquotation")}>
+          <button className="quot-add-btn" onClick={() => navigate("/quotation-template")}>
             + Add Quotation
           </button>
         </div>
@@ -228,37 +238,7 @@ function Quotation() {
 
                 <td>{user.total}</td>
 
-                {/* <td>
-                  <Dropdown>
-                    <Dropdown.Toggle
-                      id={`dropdown-${user.id}`}
-                      className={`status-btn ${user.status.toLowerCase()}`}
-                    >
-                      ● {user.status}
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu className="status-menu">
-                      <Dropdown.Item
-                        onClick={() => handleStatusChange(user.id, "Pending")}
-                      >
-                        ● Pending
-                      </Dropdown.Item>
-
-                      <Dropdown.Item
-                        onClick={() => handleStatusChange(user.id, "Approved")}
-                      >
-                        ● Approved
-                      </Dropdown.Item>
-
-                      <Dropdown.Item
-                        onClick={() => handleStatusChange(user.id, "Rejected")}
-                      >
-                        ● Rejected
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </td> */}
-
+               
                 <td>
                   {user.status === "Pending" ? (
                     <Dropdown>
@@ -297,9 +277,9 @@ function Quotation() {
                   )}
                 </td>
                 <td className="action-icons">
-                  <FaEye onClick={() => navigate("/view")} />
+                 <FaEye onClick={() => navigate(`/view/${user.id}`)} />
                   <FaDownload onClick={() => handleDownload(user.id)} />
-                  <FaEdit onClick={() => navigate("/editquotation")} />
+                  <FaEdit onClick={() => navigate(`/editquotation/${user.id}`)} />
                   <FaShareAlt onClick={() => handleShare(user.id)} />
                   <FaTrash onClick={() => handleDelete(user.id)} />
                   <FaPrint onClick={() => handlePrint(user.id)} />
@@ -318,12 +298,32 @@ function Quotation() {
         {showApproveModal && (
           <ApproveQuotation
             closeModal={() => setShowApproveModal(false)}
-            onApprove={confirmApprove}
+            quotationId={approveId} 
+            quotationNumber={users.find(u => u.id === approveId)?.quotation}
+            
+            // Ye function popup me 'Save' hone ke baad chalega
+            onApprove={() => {
+              // Option 1: Frontend ke table me turant status badal do (Fastest)
+              setUsers((prevUsers) => 
+                prevUsers.map((user) => 
+                  user.id === approveId ? { ...user, status: "Approved" } : user
+                )
+              );
+              
+              // Option 2: Agar tune table ka data backend se laane ke liye 
+              // koi function banaya hai (jaise fetchQuotations), toh tu usko bhi call kar sakta hai.
+              // fetchQuotations(); 
+
+              setShowApproveModal(false);
+            }}
           />
         )}
+        
       </div>
     </div>
   );
 }
 
+
 export default Quotation;
+

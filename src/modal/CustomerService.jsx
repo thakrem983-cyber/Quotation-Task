@@ -115,7 +115,7 @@ function CustomerService({
     <>
       <div className="service-overlay">
         <div className="service-modal">
-          <div className="modal-header">
+          <div className="custom-modal-header">
             <h3>Custom Service</h3>
             <button className="close-icon" onClick={closeModal}>
               ×

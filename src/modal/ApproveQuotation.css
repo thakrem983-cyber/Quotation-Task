@@ -52,7 +52,7 @@
   font-size: 12px;
   margin-top: 10px;
   margin-bottom: 12px;
-  padding-left: 30px;
+  padding-left: 25px;
 }
 
 .approve-container {
@@ -161,12 +161,12 @@
   /* padding: 12px; */
   border-radius: 6px;
   /* flex: 1; */
-  /* width: 48%;
+  width: 48%;
   height: 42px;
   /* padding: 10px 0; */
 }
 
-.approve-finance-btn {
+.approve-finance-btn{
   width: 40%;
   margin-top: 10px;
   padding: 6px;

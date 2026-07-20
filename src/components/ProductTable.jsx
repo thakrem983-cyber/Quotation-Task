@@ -252,7 +252,7 @@ function ProductTable({
                   )}
                 </td>
 
-                <td>₹{product.amount.toFixed(2)}</td>
+               <td>₹{(Number(product.amount) || 0).toFixed(2)}</td>
 
              
                 <td>

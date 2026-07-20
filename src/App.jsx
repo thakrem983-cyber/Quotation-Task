@@ -4,13 +4,12 @@ import EditQuotation from "./pages/EditQuotation";
 import View from "./pages/view";
 
 import Header from "./components/Header";
-// import ProductTable from "./components/ProductTable";
 import QuotationForm from "./components/QuotationForm";
 import ProductSection from "./components/ProductSection";
 import TermsSection from "./components/Term";
 import "@fontsource/poppins";
 import "./App.css";
-import api from "./api/api"; // <-- Ye API file import ho gayi
+import api from "./api/api"; 
 
 //mansi
 import AddProductItems from "./modal/AddProductItems";
@@ -58,7 +57,7 @@ function App() {
   const [notes, setNotes] = useState("");
   const [validateProducts, setValidateProducts] = useState(null);
 
-  // handleSave ab async ho gaya hai API call ke liye
+  // Ye function backend me data save karega
   const handleSave = async () => {
     if (validateQuotation && !validateQuotation()) {
       alert("Please fill required details");
@@ -70,6 +69,7 @@ function App() {
 
     const payloadForBackend = {
       quotationType: formData.quotationType,
+      quotationNumber: formData.quotationNumber,
       clientName: formData.clientName,
       subject: formData.subject,
       products: products,
@@ -77,19 +77,18 @@ function App() {
       cgst: summary.cgst,
       sgst: summary.sgst,
       other: summary.other,
-      notes: notes
+      notes: notes,
+      grandTotal: summary.grandTotal || products.reduce((acc, p) => acc + (p.amount || 0), 0)
     };
 
     console.log("Sending data to backend:", payloadForBackend);
 
     try {
-      // Backend ko data bhej  ta haaii ye
       const response = await api.post("/quotations", payloadForBackend);
-
       console.log("Backend response:", response.data);
       alert("Quotation Saved Successfully in Database!");
 
-      // Save hone ke baad form khali karta hai ye
+      // Form clear karo
       setFormData({
         quotationType: "GST",
         quotationNumber: "",
@@ -123,14 +122,14 @@ function App() {
 
       setNotes("");
     } catch (error) {
-      console.error("Backend error:", error);
-      alert("Error saving quotation. Check console.");
+      console.error("Backend error:", error.response?.data || error.message);
+      alert("Error saving quotation in database.");
+      throw error; // AddQuot ko batane ke liye ki error aayi hai
     }
   };
 
   const handleCancel = () => {
     const confirmCancel = window.confirm("Are you sure you want to cancel?");
-
     if (!confirmCancel) return;
 
     setFormData({
@@ -169,11 +168,12 @@ function App() {
 
   return (
     <Routes>
-
-      //chaitali
-
       <Route path="/" element={<Quotation />} />
-      <Route path="/addquotation" element={<AddQuot formData={formData}
+      <Route 
+        path="/addquotation" 
+        element={
+          <AddQuot 
+            formData={formData}
             setFormData={setFormData}
             products={products}
             setProducts={setProducts}
@@ -181,53 +181,51 @@ function App() {
             setSummary={setSummary}
             notes={notes}
             setNotes={setNotes}
-            handleSave={handleSave}
+            handleCreate={handleSave} // <-- Yahan App.js ka handleSave pass kiya hai
             handleCancel={handleCancel}
             setValidateQuotation={setValidateQuotation}
             setValidateProducts={setValidateProducts}
-          /> } />
+          />
+        } 
+      />
       <Route path="/quotation-template" element={<QuotationTemplate />} />
 
-        //swapnil
-      <Route
-        path="/editquotation"
-        element={
-          <EditQuotation
-            formData={formData}
-            setFormData={setFormData}
-            products={products}
-            setProducts={setProducts}
-            summary={summary}
-            setSummary={setSummary}
-            notes={notes}
-            setNotes={setNotes}
-            handleSave={handleSave}
-            handleCancel={handleCancel}
-            setValidateQuotation={setValidateQuotation}
-            setValidateProducts={setValidateProducts}
-          />
-        }
+      <Route 
+    path="/addquotation" 
+    element={
+      <AddQuot 
+        formData={formData}
+        setFormData={setFormData}
+        products={products}
+        setProducts={setProducts}
+        summary={summary}
+        setSummary={setSummary}
+        notes={notes}
+        setNotes={setNotes}
+        handleCreate={handleSave}
+        handleCancel={handleCancel}
+        setValidateQuotation={setValidateQuotation}
+        setValidateProducts={setValidateProducts}
       />
+    } 
+  />
 
-      <Route
-        path="/view"
-        element={
-          <View
-            formData={formData}
-            products={products}
-            summary={summary}
-            notes={notes}
-            setNotes={setNotes}
-          />
-        }
-      />
-      //mansi
-      <Route path="/addproduct" element={<AddProductItems />} />
-      <Route path="/approve-quotation" element={<ApproveQuotation />} />
-      <Route path="/customer-service" element={<CustomerService />} />
-      <Route path="/add-tanky-product" element={<AddTankyProduct />} />
-      <Route path="/add-service" element={<AddService />} />
+  <Route path="/quotation-template" element={<QuotationTemplate />} />
 
+  {/* 🔴 EDIT QUOTATION (Ab ye :id accept karega) */}
+  <Route path="/editquotation/:id" element={<EditQuotation />} />
+
+  {/* View Quotation */}
+  <Route path="/view/:id" element={<View />} />
+
+  {/* Other routes */}
+  <Route path="/addproduct" element={<AddProductItems />} />
+  <Route path="/approve-quotation" element={<ApproveQuotation />} />
+  <Route path="/customer-service" element={<CustomerService />} />
+  <Route path="/add-tanky-product" element={<AddTankyProduct />} />
+  <Route path="/add-service" element={<AddService />} />
+
+    
     </Routes>
   );
 }

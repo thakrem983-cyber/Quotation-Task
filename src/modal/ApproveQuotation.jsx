@@ -1,8 +1,16 @@
 import { useState } from "react";
 import "./ApproveQuotation.css";
+import api from "../api/api"; // <-- API import zaroor karna
 
-function ApproveQuotation({ closeModal, onApprove }) {
+// Props mein quotationId aur quotationNumber add kiya
+function ApproveQuotation({
+  closeModal,
+  onApprove,
+  quotationId,
+  quotationNumber,
+}) {
   const [paymentReceived, setPaymentReceived] = useState(null);
+  const [loading, setLoading] = useState(false); // Loading state add ki
 
   // YES Form
   const [amount, setAmount] = useState("");
@@ -12,31 +20,84 @@ function ApproveQuotation({ closeModal, onApprove }) {
   // NO Form
   const [expectedDate, setExpectedDate] = useState("");
   const [note, setNote] = useState("");
-  // const [isOpen, setIsOpen] = useState(true);
-  const [activeButton, setActiveButton] = useState("");
-  
   const [selectedButton, setSelectedButton] = useState("");
-  console.log(selectedButton);
 
-  const handleApprove = () => {
-  onApprove();
-  closeModal();
-};
+  const handleApprove = async () => {
+    try {
+      setLoading(true);
+
+      // 1. Agar user ne NO dabaya aur Date khali chhod di
+      if (paymentReceived === false && !expectedDate) {
+        alert("Bhai, Expected Advance Date select karna zaroori hai!");
+        setLoading(false);
+        return;
+      }
+
+      // 2. Agar user ne YES dabaya aur amount waghera nahi daala
+      if (paymentReceived === true) {
+        if (!amount || !paymentMode || !paidTo) {
+          alert("Please fill all payment details.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      // 3. Backend ko wahi naam bhejo jo usko chahiye (expectedAdvanceDate)
+      // Agar 'YES' select kiya hai toh safety ke liye aaj ki date bhej dete hain taaki error na aaye
+      const today = new Date().toISOString().split("T")[0];
+      
+      const approvePayload = {
+        expectedAdvanceDate: paymentReceived === false ? expectedDate : today,
+        expectedDate: paymentReceived === false ? expectedDate : today, // Dono bhej diye, backend jo chahe rakh le 😂
+        note: paymentReceived === false ? note : "Payment Received",
+      };
+      
+      await api.put(`/quotations/${quotationId}/approve`, approvePayload);
+
+      // 4. Agar Payment YES thi, toh Payments array mein save karo
+      if (paymentReceived === true) {
+        const paymentPayload = {
+          quotationId: quotationId,
+          amount: Number(amount),
+          paymentMode: paymentMode,
+          receivedBy: paidTo,
+          remarks: "Advance payment on approval",
+        };
+        await api.post("/payments", paymentPayload);
+      }
+
+      alert("Quotation Approved Successfully!");
+      onApprove(); // Table ko refresh karega
+      closeModal(); // Popup band karega
+
+    } catch (error) {
+      console.error("Backend se ye error aayi:", error.response?.data || error.message);
+      const backendMsg = error.response?.data?.message || "Failed to approve quotation";
+      alert(`Error: ${backendMsg}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
   const handleCancel = () => {
-  closeModal();
-};
+    closeModal();
+  };
+
   const handleFinance = () => {};
 
-  // if (!isOpen) {
-  //   return null;
-  // }
   return (
     <div className="approve-modal-overlay">
       <div className="approve-quotation-modal">
         <div className="approve-modal-header">
-          <h2>Approve Quotation #MECH202627-009</h2>
+          {/* H2 ko dynamic bana diya */}
+          <h2>Approve Quotation #{quotationNumber || "Unknown"}</h2>
 
-          <button className="approve-close-btn" onClick={closeModal}>
+          <button
+            className="approve-close-btn"
+            onClick={closeModal}
+            disabled={loading}
+          >
             ✕
           </button>
         </div>
@@ -48,7 +109,11 @@ function ApproveQuotation({ closeModal, onApprove }) {
 
           <div className="approve-button-group">
             <button
-              className={paymentReceived === true ? "approve-active-btn" : "approve-normal-btn"}
+              className={
+                paymentReceived === true
+                  ? "approve-active-btn"
+                  : "approve-normal-btn"
+              }
               onClick={() => setPaymentReceived(true)}
             >
               YES
@@ -56,7 +121,9 @@ function ApproveQuotation({ closeModal, onApprove }) {
 
             <button
               className={
-                paymentReceived === false ? "approve-active-btn" : "approve-normal-btn"
+                paymentReceived === false
+                  ? "approve-active-btn"
+                  : "approve-normal-btn"
               }
               onClick={() => setPaymentReceived(false)}
             >
@@ -98,14 +165,12 @@ function ApproveQuotation({ closeModal, onApprove }) {
                         onChange={(e) => setPaymentMode(e.target.value)}
                       >
                         <option value="">Select mode</option>
-                        <option>Cash</option>
-                        <option>NEFT</option>
-                        <option>Net Banking</option>
-                        <option>Bank Transfer</option>
-                        <option>Cheque</option>
-                        <option>UPI</option>
-                        <option>Card</option>
-                        <option>Other</option>
+                        <option value="Cash">Cash</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Cheque">Cheque</option>
+                        <option value="NEFT">NEFT</option>
+                        <option value="RTGS">RTGS</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
                       </select>
                     </div>
 
@@ -134,19 +199,24 @@ function ApproveQuotation({ closeModal, onApprove }) {
                   <div className="approve-footer-buttons">
                     <button
                       className={`approve-approve-btn ${
-                        selectedButton === "approve" ? "approve-selected-btn" : ""
+                        selectedButton === "approve"
+                          ? "approve-selected-btn"
+                          : ""
                       }`}
                       onClick={() => {
                         setSelectedButton("approve");
                         handleApprove();
                       }}
+                      disabled={loading}
                     >
-                      Approve & Save
+                      {loading ? "Saving..." : "Approve & Save"}
                     </button>
 
                     <button
                       className={`approve-cancel-btn ${
-                        selectedButton === "cancel" ? "approve-selected-btn" : ""
+                        selectedButton === "cancel"
+                          ? "approve-selected-btn"
+                          : ""
                       }`}
                       onClick={() => {
                         setSelectedButton("cancel");
@@ -193,19 +263,24 @@ function ApproveQuotation({ closeModal, onApprove }) {
                   <div className="approve-footer-buttons">
                     <button
                       className={`approve-approve-btn ${
-                        selectedButton === "approve" ? "approve-selected-btn" : ""
+                        selectedButton === "approve"
+                          ? "approve-selected-btn"
+                          : ""
                       }`}
                       onClick={() => {
                         setSelectedButton("approve");
                         handleApprove();
                       }}
+                      disabled={loading}
                     >
-                      Approve & Save
+                      {loading ? "Saving..." : "Approve & Save"}
                     </button>
 
                     <button
                       className={`approve-cancel-btn ${
-                        selectedButton === "cancel" ? "approve-selected-btn" : ""
+                        selectedButton === "cancel"
+                          ? "approve-selected-btn"
+                          : ""
                       }`}
                       onClick={() => {
                         setSelectedButton("cancel");

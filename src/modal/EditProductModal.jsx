@@ -1,5 +1,4 @@
 import React from "react";
-
 function EditProductModal({
   show,
   handleClose,
@@ -24,19 +23,14 @@ function EditProductModal({
       style={{ background: "rgba(0,0,0,0.5)" }}
     >
       <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content">
-
+        <div className="modal-content ">
           <div className="modal-header">
             <h5 className="modal-title">Edit Product</h5>
 
-            <button
-              className="btn-close"
-              onClick={handleClose}
-            ></button>
+            <button className="btn-close" onClick={handleClose}></button>
           </div>
 
           <div className="modal-body">
-
             <div className="mb-3">
               <label className="form-label">Name</label>
 
@@ -84,14 +78,10 @@ function EditProductModal({
                 onChange={handleChange}
               />
             </div>
-
           </div>
 
           <div className="modal-footer">
-            <button
-              className="btn btn-secondary"
-              onClick={handleClose}
-            >
+            <button className="btn btn-secondary" onClick={handleClose}>
               Cancel
             </button>
 
@@ -102,7 +92,6 @@ function EditProductModal({
               Save
             </button>
           </div>
-
         </div>
       </div>
     </div>
