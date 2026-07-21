@@ -1,139 +1,103 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./AddProductItems.css";
 import { FaSearch } from "react-icons/fa";
+import api from "../api/api"; // <-- Apni API file connect karna zaroori hai
 
-// function AddProductItems({ closeModal }) {
 function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
+  // Backend se aaye products store karne ke liye
+  const [backendProducts, setBackendProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [category, setCategory] = useState("");
   const [search, setSearch] = useState("");
-
   const [selectAll, setSelectAll] = useState(false);
 
-  const [checkedRows, setCheckedRows] = useState({
-    row1: false,
-    row2: false,
-    row3: false,
-    row4: false,
-    row5: false,
+  // Ab hum dynamic IDs use karenge check aur quantity ke liye
+  const [checkedRows, setCheckedRows] = useState({});
+  const [quantities, setQuantities] = useState({});
+
+  // 1. Backend se products fetch karne ke liye useEffect
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get("/products"); // Aapka backend route
+        // Backend se data response.data.data me aa sakta hai, apne hisaab se adjust kar lena
+        const data = response.data.data || response.data || []; 
+        setBackendProducts(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching products from backend:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // 2. Filter logic (Search aur Category ke hisaab se)
+  const filteredProducts = backendProducts.filter((product) => {
+    const matchesSearch =
+      product.productName.toLowerCase().includes(search.toLowerCase()) ||
+      product.productCode.toLowerCase().includes(search.toLowerCase());
+
+    // Kyunki backend me category ek array of strings hai
+    const categoryString = Array.isArray(product.category) 
+      ? product.category.join(", ") 
+      : (product.category || "");
+
+    const matchesCategory =
+      category === "" || categoryString.toLowerCase().includes(category.toLowerCase());
+
+    return matchesSearch && matchesCategory;
   });
-
-  const products = [
-    {
-      id: 1,
-      name: "Test Product45",
-      code: "DH00012",
-      category: "Electronics",
-      price: 5000,
-      unit: "bags",
-    },
-    {
-      id: 2,
-      name: "Roofing Materials",
-      code: "DH00001",
-      category: "Roofing Materials",
-      price: 100000,
-      unit: "kilogram",
-    },
-    {
-      id: 3,
-      name: "Tiles",
-      code: "DH00025",
-      category: "Tiles",
-      price: 3000,
-      unit: "pcs",
-    },
-  ];
-
-  const [quantities, setQuantities] = useState({
-    row1: 0,
-    row2: 0,
-    row3: 0,
-    row4: 0,
-    row5: 0,
-  });
-
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(search.toLowerCase()) ||
-      product.code.toLowerCase().includes(search.toLowerCase()) ||
-      product.category.toLowerCase().includes(search.toLowerCase()),
-  );
 
   const handleCancel = () => {
     closeModal();
   };
 
+  // 3. Add to Table Logic (Dynamic)
   const handleAdd = () => {
     const newProducts = [];
 
-    if (checkedRows.row1 && Number(quantities.row1) > 0) {
-      newProducts.push({
-        id: Date.now() + 1,
-        productName: "Test Product45",
-        code: "DH00012",
-        unit: "bags",
-        price: 5000,
-        quantity: Number(quantities.row1),
-        amount: 5000 * Number(quantities.row1),
-        isEditing: false,
-      });
+    filteredProducts.forEach((product) => {
+      const isChecked = checkedRows[product._id];
+      const qty = quantities[product._id] || 0;
+
+      if (isChecked && Number(qty) > 0) {
+        newProducts.push({
+          id: Date.now() + Math.random(), // Table ke liye naya unique ID
+          productName: product.productName,
+          code: product.productCode,
+          unit: product.unit,
+          price: product.price,
+          quantity: Number(qty),
+          amount: product.price * Number(qty),
+          isEditing: false,
+          image: product.image || null,
+        });
+      }
+    });
+
+    if (newProducts.length === 0) {
+      alert("plz select the product");
+      return;
     }
 
-    if (checkedRows.row2 && Number(quantities.row2) > 0) {
-      newProducts.push({
-        id: Date.now() + 2,
-        productName: "Roofing materials",
-        code: "DH0001",
-        unit: "kilogram (kg)",
-        price: 100000,
-        quantity: Number(quantities.row2),
-        amount: 100000 * Number(quantities.row2),
-        isEditing: false,
-      });
-    }
-
-    if (checkedRows.row3 && Number(quantities.row3) > 0) {
-      newProducts.push({
-        id: Date.now() + 3,
-        productName: "Test Product23",
-        code: "PROD046",
-        unit: "bags",
-        price: 20000,
-        quantity: Number(quantities.row3),
-        amount: 20000 * Number(quantities.row3),
-        isEditing: false,
-      });
-    }
-
-    if (checkedRows.row4 && Number(quantities.row4) > 0) {
-      newProducts.push({
-        id: Date.now() + 4,
-        productName: "Test Product",
-        code: "PROD048",
-        unit: "Square Yards",
-        price: 20000,
-        quantity: Number(quantities.row4),
-        amount: 20000 * Number(quantities.row4),
-        isEditing: false,
-      });
-    }
-
-    if (checkedRows.row5 && Number(quantities.row5) > 0) {
-      newProducts.push({
-        id: Date.now() + 5,
-        productName: "Product1",
-        code: "DH0005",
-        unit: "bags",
-        price: 1000,
-        quantity: Number(quantities.row5),
-        amount: 1000 * Number(quantities.row5),
-        isEditing: false,
-      });
-    }
-
+    // Main quotation table me add kar diya
     setProducts([...mainProducts, ...newProducts]);
-
     closeModal();
+  };
+
+  // Select All check/uncheck logic
+  const handleSelectAll = (e) => {
+    const isChecked = e.target.checked;
+    setSelectAll(isChecked);
+
+    const newCheckedRows = {};
+    filteredProducts.forEach((p) => {
+      newCheckedRows[p._id] = isChecked;
+    });
+    setCheckedRows(newCheckedRows);
   };
 
   return (
@@ -149,7 +113,6 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
         <div className="top-section">
           <div className="search-container">
             <FaSearch className="search-icon" />
-
             <input
               type="text"
               placeholder="Search products..."
@@ -165,6 +128,7 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
             onChange={(e) => setCategory(e.target.value)}
           >
             <option value="">Select category</option>
+            {/* Backend ke categories ke hisaab se isko update kar sakte ho */}
             <option value="Electronics">Electronics</option>
             <option value="Roofing Materials">Roofing Materials</option>
             <option value="Roofing Sheets">Roofing Sheets</option>
@@ -174,51 +138,40 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
         </div>
 
         <div className="table-container">
-          <table className="product-table">
-            <thead>
-              <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    checked={selectAll}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
+          {loading ? (
+            <p style={{ textAlign: "center", padding: "20px" }}>Loading products from backend...</p>
+          ) : (
+            <table className="product-table">
+              <thead>
+                <tr>
+                  <th>
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
+                  <th>PRODUCT NAME</th>
+                  <th>CODE</th>
+                  <th>CATEGORY</th>
+                  <th>PRICE</th>
+                  <th>UNIT</th>
+                  <th>QUANTITY</th>
+                </tr>
+              </thead>
 
-                      setSelectAll(checked);
-
-                      setCheckedRows({
-                        row1: checked,
-                        row2: checked,
-                        row3: checked,
-                        row4: checked,
-                        row5: checked,
-                      });
-                    }}
-                  />
-                </th>
-                <th>PRODUCT NAME</th>
-                <th>CODE</th>
-                <th>CATEGORY</th>
-                <th>PRICE</th>
-                <th>UNIT</th>
-                <th>QUANTITY</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {("Test Product45".toLowerCase().includes(search.toLowerCase()) ||
-                search === "") &&
-                (category === "" ||
-                  "Electronics, Tiles".includes(category)) && (
-                  <tr>
+              <tbody>
+                {/* 4. Ab hum .map() ka use karke table render karenge */}
+                {filteredProducts.map((product) => (
+                  <tr key={product._id}>
                     <td>
                       <input
                         type="checkbox"
-                        checked={checkedRows.row1}
+                        checked={checkedRows[product._id] || false}
                         onChange={(e) =>
                           setCheckedRows({
                             ...checkedRows,
-                            row1: e.target.checked,
+                            [product._id]: e.target.checked,
                           })
                         }
                       />
@@ -226,24 +179,33 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
 
                     <td>
                       <div className="product-info">
-                        <img
-                          src="src/assets/paragliding.jpg"
-                          alt=""
-                          className="product-img"
-                        />
-                        <span>Test Product45</span>
+                        {product.image ? (
+                          <img src={product.image} alt={product.productName} className="product-img" />
+                        ) : (
+                          <div className="product-img-placeholder"></div>
+                        )}
+                        <span>{product.productName}</span>
                       </div>
                     </td>
 
-                    <td>DH00012</td>
-                    <td>Electronics, Tiles</td>
-                    <td>₹5,000</td>
+                    <td>{product.productCode}</td>
+                    
+                    {/* Category backend me array hai, isliye join kiya */}
+                    <td>
+                      {Array.isArray(product.category) 
+                        ? product.category.join(", ") 
+                        : product.category}
+                    </td>
+                    
+                    <td>₹{product.price}</td>
 
                     <td>
-                      <select className="unit-select">
-                        <option>bags</option>
-                        <option>kilogram (kg)</option>
-                        <option>Square Yards</option>
+                      <select 
+                        className="unit-select" 
+                        value={product.unit} 
+                        disabled
+                      >
+                        <option value={product.unit}>{product.unit}</option>
                       </select>
                     </td>
 
@@ -251,251 +213,30 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
                       <input
                         type="number"
                         className="qty-input"
-                        value={quantities.row1}
+                        value={quantities[product._id] || ""}
                         min="0"
+                        placeholder="0"
                         onChange={(e) =>
                           setQuantities({
                             ...quantities,
-                            row1: e.target.value,
+                            [product._id]: e.target.value,
                           })
                         }
                       />
                     </td>
                   </tr>
-                )}
+                ))}
 
-              {("Roofing materials"
-                .toLowerCase()
-                .includes(search.toLowerCase()) ||
-                search === "") &&
-                (category === "" || "Roofing Materials".includes(category)) && (
+                {filteredProducts.length === 0 && (
                   <tr>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={checkedRows.row2}
-                        onChange={(e) =>
-                          setCheckedRows({
-                            ...checkedRows,
-                            row2: e.target.checked,
-                          })
-                        }
-                      />
-                    </td>
-
-                    <td>
-                      <div className="product-info">
-                        <img
-                          src="src/assets/paragliding.jpg"
-                          alt=""
-                          className="product-img"
-                        />
-                        <span>Roofing materials</span>
-                      </div>
-                    </td>
-
-                    <td>DH0001</td>
-                    <td>Roofing Materials</td>
-                    <td>₹1,00,000</td>
-
-                    <td>
-                      <select className="unit-select">
-                        <option>kilogram (kg)</option>
-                        <option>bags</option>
-                        <option>Square Yards</option>
-                      </select>
-                    </td>
-
-                    <td>
-                      <input
-                        type="number"
-                        className="qty-input"
-                        value={quantities.row2}
-                        min="0"
-                        onChange={(e) =>
-                          setQuantities({
-                            ...quantities,
-                            row2: e.target.value,
-                          })
-                        }
-                      />
+                    <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
+                      No products found.
                     </td>
                   </tr>
                 )}
-
-              {("Test Product23".toLowerCase().includes(search.toLowerCase()) ||
-                search === "") &&
-                (category === "" || "Roofing Sheets".includes(category)) && (
-                  <tr>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={checkedRows.row3}
-                        onChange={(e) =>
-                          setCheckedRows({
-                            ...checkedRows,
-                            row3: e.target.checked,
-                          })
-                        }
-                      />
-                    </td>
-
-                    <td>
-                      <div className="product-info">
-                        <img
-                          src="src/assets/paragliding.jpg"
-                          alt=""
-                          className="product-img"
-                        />
-                        <span>Test Product23</span>
-                      </div>
-                    </td>
-
-                    <td>PROD046</td>
-                    <td>Roofing Sheets</td>
-                    <td>₹20,000</td>
-
-                    <td>
-                      <select className="unit-select">
-                        <option>bags</option>
-                        <option>kilogram (kg)</option>
-                        <option>Square Yards</option>
-                      </select>
-                    </td>
-
-                    <td>
-                      <input
-                        type="number"
-                        className="qty-input"
-                        value={quantities.row3}
-                        min="0"
-                        onChange={(e) =>
-                          setQuantities({
-                            ...quantities,
-                            row3: e.target.value,
-                          })
-                        }
-                      />
-                    </td>
-                  </tr>
-                )}
-
-              {("Test Product".toLowerCase().includes(search.toLowerCase()) ||
-                search === "") &&
-                (category === "" ||
-                  "belt, Tiles, Roofing sheets".includes(category)) && (
-                  <tr>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={checkedRows.row4}
-                        onChange={(e) =>
-                          setCheckedRows({
-                            ...checkedRows,
-                            row4: e.target.checked,
-                          })
-                        }
-                      />
-                    </td>
-
-                    <td>
-                      <div className="product-info">
-                        <img
-                          src="src/assets/paragliding.jpg"
-                          alt=""
-                          className="product-img"
-                        />
-                        <span>Test Product</span>
-                      </div>
-                    </td>
-
-                    <td>PROD048</td>
-                    <td>belt, Tiles, Roofing sheets</td>
-                    <td>₹20,000</td>
-
-                    <td>
-                      <select className="unit-select">
-                        <option>Square Yards</option>
-                        <option>kilogram (kg)</option>
-                        <option>bags</option>
-                      </select>
-                    </td>
-
-                    <td>
-                      <input
-                        type="number"
-                        className="qty-input"
-                        value={quantities.row4}
-                        min="0"
-                        onChange={(e) =>
-                          setQuantities({
-                            ...quantities,
-                            row4: e.target.value,
-                          })
-                        }
-                      />
-                    </td>
-                  </tr>
-                )}
-
-              {("Product1".toLowerCase().includes(search.toLowerCase()) ||
-                search === "") &&
-                (category === "" ||
-                  "Electronics, TOOL, BASE".includes(category)) && (
-                  <tr>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={checkedRows.row5}
-                        onChange={(e) =>
-                          setCheckedRows({
-                            ...checkedRows,
-                            row5: e.target.checked,
-                          })
-                        }
-                      />
-                    </td>
-
-                    <td>
-                      <div className="product-info">
-                        <img
-                          src="src/assets/paragliding.jpg"
-                          alt=""
-                          className="product-img"
-                        />
-                        <span>Product1</span>
-                      </div>
-                    </td>
-
-                    <td>DH0005</td>
-                    <td>Electronics, TOOL, BASE</td>
-                    <td>₹1,000</td>
-
-                    <td>
-                      <select className="unit-select">
-                        <option>bags</option>
-                        <option>kilogram (kg)</option>
-                      </select>
-                    </td>
-
-                    <td>
-                      <input
-                        type="number"
-                        className="qty-input"
-                        value={quantities.row5}
-                        min="0"
-                        onChange={(e) =>
-                          setQuantities({
-                            ...quantities,
-                            row5: e.target.value,
-                          })
-                        }
-                      />
-                    </td>
-                  </tr>
-                )}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          )}
         </div>
 
         <div className="footer">
@@ -506,4 +247,5 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
     </div>
   );
 }
+
 export default AddProductItems;

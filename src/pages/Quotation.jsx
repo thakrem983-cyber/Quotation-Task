@@ -314,7 +314,7 @@ function Quotation() {
               // koi function banaya hai (jaise fetchQuotations), toh tu usko bhi call kar sakta hai.
               // fetchQuotations(); 
 
-              setShowApproveModal(false);
+              // setShowApproveModal(false);
             }}
           />
         )}
