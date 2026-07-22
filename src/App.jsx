@@ -23,6 +23,10 @@ import Quotation from "./pages/Quotation";
 import AddQuot from "./pages/AddQuot";
 import QuotationTemplate from "./pages/QuotationTemplate";
 
+//client finance
+import ClientFinanceMain from "./pages/ClientFinanceMain";
+import ClientFinance from "./pages/ClientFinance";
+
 function App() {
   const [validateQuotation, setValidateQuotation] = useState(null);
 
@@ -224,6 +228,17 @@ function App() {
   <Route path="/customer-service" element={<CustomerService />} />
   <Route path="/add-tanky-product" element={<AddTankyProduct />} />
   <Route path="/add-service" element={<AddService />} />
+
+   <Route
+        path="//client-financeMain/create"
+        element={<ClientFinanceMain />}
+      />
+
+      <Route
+        path="/client-finance"
+        element={<ClientFinance />}
+      />
+
 
     
     </Routes>

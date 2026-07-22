@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import "./AddProductItems.css";
 import { FaSearch } from "react-icons/fa";
-import api from "../api/api"; // <-- Apni API file connect karna zaroori hai
+import api from "../api/api";
 
 function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
-  // Backend se aaye products store karne ke liye
+
   const [backendProducts, setBackendProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,17 +12,17 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
   const [search, setSearch] = useState("");
   const [selectAll, setSelectAll] = useState(false);
 
-  // Ab hum dynamic IDs use karenge check aur quantity ke liye
+
   const [checkedRows, setCheckedRows] = useState({});
   const [quantities, setQuantities] = useState({});
 
-  // 1. Backend se products fetch karne ke liye useEffect
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await api.get("/products"); // Aapka backend route
-        // Backend se data response.data.data me aa sakta hai, apne hisaab se adjust kar lena
-        const data = response.data.data || response.data || []; 
+        const response = await api.get("/products");
+
+        const data = response.data.data || response.data || [];
         setBackendProducts(data);
         setLoading(false);
       } catch (error) {
@@ -34,15 +34,14 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
     fetchProducts();
   }, []);
 
-  // 2. Filter logic (Search aur Category ke hisaab se)
+
   const filteredProducts = backendProducts.filter((product) => {
     const matchesSearch =
       product.productName.toLowerCase().includes(search.toLowerCase()) ||
       product.productCode.toLowerCase().includes(search.toLowerCase());
 
-    // Kyunki backend me category ek array of strings hai
-    const categoryString = Array.isArray(product.category) 
-      ? product.category.join(", ") 
+    const categoryString = Array.isArray(product.category)
+      ? product.category.join(", ")
       : (product.category || "");
 
     const matchesCategory =
@@ -55,7 +54,6 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
     closeModal();
   };
 
-  // 3. Add to Table Logic (Dynamic)
   const handleAdd = () => {
     const newProducts = [];
 
@@ -65,7 +63,7 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
 
       if (isChecked && Number(qty) > 0) {
         newProducts.push({
-          id: Date.now() + Math.random(), // Table ke liye naya unique ID
+          id: Date.now() + Math.random(),
           productName: product.productName,
           code: product.productCode,
           unit: product.unit,
@@ -83,23 +81,25 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
       return;
     }
 
-    // Main quotation table me add kar diya
     setProducts([...mainProducts, ...newProducts]);
     closeModal();
   };
 
-  // Select All check/uncheck logic
   const handleSelectAll = (e) => {
     const isChecked = e.target.checked;
     setSelectAll(isChecked);
 
     const newCheckedRows = {};
+    const newQuantities = {};
+
     filteredProducts.forEach((p) => {
       newCheckedRows[p._id] = isChecked;
+      newQuantities[p._id] = isChecked ? 1 : 0;
     });
-    setCheckedRows(newCheckedRows);
-  };
 
+    setCheckedRows(newCheckedRows);
+    setQuantities(newQuantities);
+  };
   return (
     <div className="modal">
       <div className="modal-box">
@@ -128,7 +128,6 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
             onChange={(e) => setCategory(e.target.value)}
           >
             <option value="">Select category</option>
-            {/* Backend ke categories ke hisaab se isko update kar sakte ho */}
             <option value="Electronics">Electronics</option>
             <option value="Roofing Materials">Roofing Materials</option>
             <option value="Roofing Sheets">Roofing Sheets</option>
@@ -161,19 +160,28 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
               </thead>
 
               <tbody>
-                {/* 4. Ab hum .map() ka use karke table render karenge */}
+
                 {filteredProducts.map((product) => (
                   <tr key={product._id}>
                     <td>
                       <input
                         type="checkbox"
                         checked={checkedRows[product._id] || false}
-                        onChange={(e) =>
-                          setCheckedRows({
-                            ...checkedRows,
-                            [product._id]: e.target.checked,
-                          })
-                        }
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+
+                          setCheckedRows((prev) => ({
+                            ...prev,
+                            [product._id]: checked,
+                          }));
+
+                          setQuantities((prev) => ({
+                            ...prev,
+                            [product._id]: checked
+                              ? (prev[product._id] || 1) // If checked, set to 1 if empty
+                              : 0,                       // If unchecked, set to 0
+                          }));
+                        }}
                       />
                     </td>
 
@@ -189,20 +197,19 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
                     </td>
 
                     <td>{product.productCode}</td>
-                    
-                    {/* Category backend me array hai, isliye join kiya */}
+
                     <td>
-                      {Array.isArray(product.category) 
-                        ? product.category.join(", ") 
+                      {Array.isArray(product.category)
+                        ? product.category.join(", ")
                         : product.category}
                     </td>
-                    
+
                     <td>₹{product.price}</td>
 
                     <td>
-                      <select 
-                        className="unit-select" 
-                        value={product.unit} 
+                      <select
+                        className="unit-select"
+                        value={product.unit}
                         disabled
                       >
                         <option value={product.unit}>{product.unit}</option>
@@ -213,14 +220,13 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
                       <input
                         type="number"
                         className="qty-input"
-                        value={quantities[product._id] || ""}
+                        value={quantities[product._id] || 0}
                         min="0"
-                        placeholder="0"
                         onChange={(e) =>
-                          setQuantities({
-                            ...quantities,
-                            [product._id]: e.target.value,
-                          })
+                          setQuantities((prev) => ({
+                            ...prev,
+                            [product._id]: Number(e.target.value),
+                          }))
                         }
                       />
                     </td>

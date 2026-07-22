@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // <-- Imported useNavigate
 import "./ApproveQuotation.css";
 import api from "../api/api";
 
@@ -8,6 +9,8 @@ function ApproveQuotation({
   quotationId,
   quotationNumber,
 }) {
+  const navigate = useNavigate(); // <-- Initialized navigate hook
+
   const [paymentReceived, setPaymentReceived] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false); // <-- Naya state banaya to track saving
@@ -84,8 +87,17 @@ function ApproveQuotation({
   };
 
   const handleFinance = () => {
-    // Yahan Create Finance ka logic daal dena
-    alert("Create Finance clicked!");
+    // Navigate to Client Finance and pass the quotation data securely in memory
+    navigate('/client-financeMain/create', { 
+      state: { 
+        quotation: {
+          id: quotationId,
+          quotationNumber: quotationNumber,
+          // You can pass the approved advance amount here if needed in Finance module
+          advanceAmount: paymentReceived ? amount : 0 
+        }
+      } 
+    });
   };
 
   return (
