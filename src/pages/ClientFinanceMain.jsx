@@ -8,7 +8,7 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-// import "./ClientFinanceMain.css"; 
+ import "./ClientFinanceMain.css"; 
 
 function ClientFinanceMain() {
   const navigate = useNavigate();
@@ -131,7 +131,7 @@ function ClientFinanceMain() {
           {/* --- Table --- */}
           <div className="table-responsive">
             <table className="table table-hover align-middle mb-0" style={{ fontSize: "14px" }}>
-              <thead style={{ backgroundColor: "#f4f6fb", color: "#6c757d" }}>
+              <thead className="finance-thead">
                 <tr>
                   <th className="border-0 rounded-start-3 py-3 ps-3" width="50">
                     <input className="form-check-input shadow-none" type="checkbox" />
