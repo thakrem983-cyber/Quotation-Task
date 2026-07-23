@@ -37,7 +37,7 @@ function ProductTable({
       <h5 className="mb-3 fw-semibold">Products</h5>
 
       <div className="table-responsive">
-        <table className="table align-middle">
+        <table className="table-pr align-middle">
           <thead className="table-light">
             <tr>
               <th>S.NO</th>
