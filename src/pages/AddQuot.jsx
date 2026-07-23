@@ -7,6 +7,9 @@ import TermsSection from "../components/Term";
 import "@fontsource/poppins";
 import "../App.css";
 
+// 🔴 Zaroori: Apni API file import karna mat bhoolna
+import api from "../api/api"; 
+
 function AddQuot({
   formData,
   setFormData,
@@ -35,54 +38,83 @@ function AddQuot({
     }
   }, [location.state]);
 
-  // 🔴 CREATE & TEMPLATE SAVE HANDLER
-  const customCreateHandler = async (e) => {
+  // 🔴 CREATE, TEMPLATE SAVE & UPLOAD HANDLER
+  // Yahan hum (e) ke sath (uploadedFiles) array bhi receive kar rahe hain
+  const customCreateHandler = async (e, uploadedFiles = []) => {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
 
-    // 1. Safe Checkbox Check (Aapke checkbox ki key jo bhi ho)
-    const isSaveAsTemplate = 
-      formData?.isSaveAsTemplate || 
-      formData?.isTemplate || 
-      formData?.saveAsTemplate || 
-      formData?.template || 
-      formData?.check ||
-      true; // 👈 FOR TESTING: Agar checkbox nahi mila toh bhi forced save karega
+    // 1. Proper Checkbox Check (Testing wala true hata diya)
+    const isSaveAsTemplate = formData?.isSaveAsTemplate === true;
 
-    console.log("Saving Template... Data:", { formData, products, summary, notes });
+    // 2. Sirf tabhi Template save hoga jab tick laga hoga
+    if (isSaveAsTemplate) {
+      console.log("Saving Template... Data:", { formData, products, summary, notes });
+      const newTemplate = {
+        id: Date.now(),
+        quotationName: formData?.quotationName || formData?.quotation_name || formData?.quotationNumber || "Custom Quotation",
+        formData: formData || {},
+        products: products || [],
+        summary: summary || {},
+        notes: notes || "",
+      };
 
-    // 2. Naya Template Data Object Banao
-    const newTemplate = {
-      id: Date.now(),
-      quotationName: formData?.quotationName || formData?.quotation_name || formData?.quotationNumber || "Custom Quotation",
-      formData: formData || {},
-      products: products || [],
-      summary: summary || {},
-      notes: notes || "",
-    };
-
-    // 3. LocalStorage me Push karo
-    try {
-      const existingTemplates = JSON.parse(localStorage.getItem("quotationTemplates")) || [];
-      existingTemplates.push(newTemplate);
-      localStorage.setItem("quotationTemplates", JSON.stringify(existingTemplates));
-      console.log("Successfully saved in LocalStorage!");
-    } catch (error) {
-      console.error("LocalStorage Error:", error);
-    }
-
-    // 4. External Save Handler Call Karo (if provided)
-    if (handleCreate) {
       try {
-        await handleCreate(e);
-      } catch (err) {
-        console.log("handleCreate optional error handled");
+        const existingTemplates = JSON.parse(localStorage.getItem("quotationTemplates")) || [];
+        existingTemplates.push(newTemplate);
+        localStorage.setItem("quotationTemplates", JSON.stringify(existingTemplates));
+        console.log("Successfully saved in LocalStorage!");
+      } catch (error) {
+        console.error("LocalStorage Error:", error);
       }
     }
 
-    // 5. Explicitly Navigate
-    navigate("/quotation-template");
+    // 3. Asli Quotation aur Files Backend par Save karne ka Logic
+    try {
+      let newQuotationId = null;
+
+      // A) Pehle Quotation save karo (handleCreate ke through)
+      if (handleCreate) {
+        // Bhai, dhyan rakhna ki aapka parent component mein jo handleCreate hai, 
+        // wo backend se Quotation save hone ke baad uska ID return kare.
+        const response = await handleCreate(e);
+        
+        // Response se ID nikalne ka fallback logic
+       newQuotationId = response?.data?._id || response?.data?.id || response?.data?.data?._id;
+      }
+
+      // B) Agar Quotation save ho gaya aur user ne files daali hain, toh File Upload chalao
+      if (newQuotationId && uploadedFiles.length > 0) {
+        console.log(`Uploading ${uploadedFiles.length} files to backend...`);
+        console.log("Extracted Quotation ID:", newQuotationId);
+        
+        // Loop chala kar ek-ek file backend bhejenge (Kyunki backend pe upload.single hai)
+        for (let i = 0; i < uploadedFiles.length; i++) {
+          const formPayload = new FormData();
+          formPayload.append("attachment", uploadedFiles[i]); // "attachment" naam backend se match karna chahiye
+
+          try {
+            await api.post(`/upload/${newQuotationId}`, formPayload, {
+              headers: {
+                "Content-Type": "multipart/form-data", // Files ke liye zaroori header
+              },
+            });
+            console.log(`File ${i + 1} uploaded successfully!`);
+          } catch (uploadError) {
+            console.error(`File ${i + 1} upload fail:`, uploadError);
+          }
+        }
+      }
+
+      // 4. Sab successful hone ke baad Explicitly Navigate karo
+      alert("Quotation saved successfully!");
+      navigate("/quotation-template"); // Ya jahan bhi aap bhejte ho
+
+    } catch (err) {
+      console.error("Save karte time error aayi:", err);
+      alert("Failed to save Quotation.");
+    }
   };
 
   const customCancelHandler = (e) => {
@@ -118,7 +150,7 @@ function AddQuot({
         setNotes={setNotes}
         formData={formData}
         setFormData={setFormData}
-        handleSave={customCreateHandler} 
+        handleSave={customCreateHandler} // Yahan se file receive hongi upar wale function me
         handleCancel={customCancelHandler}
         saveButtonText="Create" 
         cancelButtonText="Cancel"

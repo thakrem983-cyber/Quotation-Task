@@ -178,8 +178,8 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
                           setQuantities((prev) => ({
                             ...prev,
                             [product._id]: checked
-                              ? (prev[product._id] || 1) // If checked, set to 1 if empty
-                              : 0,                       // If unchecked, set to 0
+                              ? (prev[product._id] || 1) 
+                              : 0,                       
                           }));
                         }}
                       />

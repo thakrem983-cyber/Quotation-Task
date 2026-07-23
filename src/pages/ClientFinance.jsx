@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa"; 
+import { FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 import { Country, State, City } from "country-state-city";
 
 // Sabhi Modals Import Karo
@@ -23,17 +23,17 @@ function ClientFinance() {
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [pincode, setPincode] = useState("");
-  
-  const [selectedCountry, setSelectedCountry] = useState("IN"); 
+
+  const [selectedCountry, setSelectedCountry] = useState("IN");
   const [selectedState, setSelectedState] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
-  
+
   const [gstin, setGstin] = useState("12ABCDE1234F1Z5");
   const [subject, setSubject] = useState("");
   const [project, setProject] = useState("");
   const [notes, setNotes] = useState("");
 
-  const [productMode, setProductMode] = useState(null); 
+  const [productMode, setProductMode] = useState(null);
 
   // --- Table States ---
   const [products, setProducts] = useState([]);
@@ -42,8 +42,8 @@ function ClientFinance() {
 
   // --- Modals Visibility ---
   const [showProductModal, setShowProductModal] = useState(false);
-  const [showCustomModal, setShowCustomModal] = useState(false); 
-  const [showTankyModal, setShowTankyModal] = useState(false); 
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const [showTankyModal, setShowTankyModal] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
   const [showDebitModal, setShowDebitModal] = useState(false);
 
@@ -94,9 +94,40 @@ function ClientFinance() {
   const orangeBtnStyle = { backgroundColor: "#f58c22", color: "white", border: "none" };
   const orangeOutlineBtnStyle = { backgroundColor: "transparent", color: "#f58c22", border: "1px solid #f58c22" };
 
+  //validations
+  const handleCreate = () => {
+    if (clientName.trim() === "") {
+      alert("Client Name is required.");
+      return;
+    }
+
+    if (!/^[A-Za-z\s]+$/.test(clientName)) {
+      alert("Client Name should contain only letters and spaces.");
+      return;
+    }
+
+    if (phone.length !== 10) {
+      alert("Phone number must be exactly 10 digits.");
+      return;
+    }
+
+    if (pincode.length !== 6) {
+      alert("Pincode must be exactly 6 digits.");
+      return;
+    }
+
+    alert("Client Finance Created!");
+
+    if (email.trim() !== "" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    alert("Client Finance Created!");
+  };
   return (
     <div className="container-fluid py-4 bg-white" style={{ minHeight: "100vh", fontSize: "14px" }}>
-      
+
       {/* Header */}
       <div className="d-flex align-items-center mb-2">
         <FaArrowLeft className="me-2 text-dark" style={{ cursor: "pointer" }} onClick={() => navigate(-1)} />
@@ -119,7 +150,20 @@ function ClientFinance() {
         </div>
         <div className="col-md-4">
           <label className="form-label fw-bold">Client Name <span className="text-danger">*</span></label>
-          <input type="text" className="form-control" placeholder="Enter client name" value={clientName} onChange={(e) => setClientName(e.target.value)} />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Enter client name"
+            value={clientName}
+            onChange={(e) => {
+              const value = e.target.value;
+
+              // Allow only letters and spaces
+              if (/^[A-Za-z\s]*$/.test(value)) {
+                setClientName(value);
+              }
+            }}
+          />
         </div>
         <div className="col-md-4">
           <label className="form-label fw-bold">Date <span className="text-danger">*</span></label>
@@ -130,12 +174,32 @@ function ClientFinance() {
           <label className="form-label fw-bold">Phone</label>
           <div className="input-group">
             <select className="form-select" style={{ maxWidth: "90px" }} value={phoneCode} onChange={(e) => setPhoneCode(e.target.value)}><option>🇮🇳 +91</option></select>
-            <input type="text" className="form-control" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Enter phone number"
+              value={phone}
+              maxLength={10}
+              onChange={(e) => {
+                const value = e.target.value;
+
+                // Allow only numbers and maximum 10 digits
+                if (/^\d{0,10}$/.test(value)) {
+                  setPhone(value);
+                }
+              }}
+            />
           </div>
         </div>
         <div className="col-md-8">
           <label className="form-label fw-bold">Email</label>
-          <input type="email" className="form-control" placeholder="Enter email address" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            type="email"
+            className="form-control"
+            placeholder="Enter email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </div>
         <div className="col-md-8">
           <label className="form-label fw-bold">Address</label>
@@ -143,7 +207,21 @@ function ClientFinance() {
         </div>
         <div className="col-md-4">
           <label className="form-label fw-bold">Pincode</label>
-          <input type="text" className="form-control" placeholder="Enter pincode" value={pincode} onChange={(e) => setPincode(e.target.value)} />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Enter pincode"
+            value={pincode}
+            maxLength={6}
+            onChange={(e) => {
+              const value = e.target.value;
+
+              // Allow only digits up to 6 characters
+              if (/^\d{0,6}$/.test(value)) {
+                setPincode(value);
+              }
+            }}
+          />
         </div>
 
         {/* Location Dropdowns */}
@@ -230,7 +308,7 @@ function ClientFinance() {
         {/* Buttons & Calculations Container */}
         <div className="row g-4">
           <div className="col-md-7 d-flex gap-2 align-items-start">
-            
+
             <button className="btn btn-light border fw-bold text-dark d-flex align-items-center" disabled={productMode === "tanky"} onClick={() => { setProductMode("standard"); setShowProductModal(true); }}>
               <FaPlus className="me-2 text-warning" /> Add product items
             </button>
@@ -245,11 +323,11 @@ function ClientFinance() {
           </div>
 
           <div className="col-md-5">
-             <div className="bg-light p-4 rounded border">
-                <div className="d-flex justify-content-between mb-2 text-muted">
-                  <span>Products total</span><span className="fw-bold text-dark">₹ {productsTotal.toFixed(2)}</span>
-                </div>
-                <div className="d-flex justify-content-between align-items-center mb-2 text-muted">
+            <div className="bg-light p-4 rounded border">
+              <div className="d-flex justify-content-between mb-2 text-muted">
+                <span>Products total</span><span className="fw-bold text-dark">₹ {productsTotal.toFixed(2)}</span>
+              </div>
+              <div className="d-flex justify-content-between align-items-center mb-2 text-muted">
                 <span>Discount</span>
                 <div className="d-flex align-items-center gap-2">
                   <div className="input-group input-group-sm" style={{ width: "80px" }}>
@@ -289,11 +367,11 @@ function ClientFinance() {
                   <span className="text-success fw-bold" style={{ width: "60px", textAlign: "right" }}>+ ₹ {otherAmt.toFixed(2)}</span>
                 </div>
               </div>
-                <div className="d-flex justify-content-between border-top pt-2 mt-2">
-                  <span className="fw-bold text-dark fs-6">Total Amount</span>
-                  <span className="fw-bold text-dark fs-6">₹ {finalTotalAmount.toFixed(2)}</span>
-                </div>
-             </div>
+              <div className="d-flex justify-content-between border-top pt-2 mt-2">
+                <span className="fw-bold text-dark fs-6">Total Amount</span>
+                <span className="fw-bold text-dark fs-6">₹ {finalTotalAmount.toFixed(2)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -360,25 +438,31 @@ function ClientFinance() {
           </div>
         </div>
       </div>
-      
+
       <div className="d-flex justify-content-end gap-3 mt-4 mb-5">
         <button className="btn px-5 fw-bold" style={orangeOutlineBtnStyle} onClick={() => navigate(-1)}>Cancel</button>
-        <button className="btn px-5 fw-bold" style={orangeBtnStyle} onClick={() => alert("Client Finance Created!")}>Create</button>
+        <button
+          className="btn px-5 fw-bold"
+          style={orangeBtnStyle}
+          onClick={handleCreate}
+        >
+          Create
+        </button>
       </div>
-      
+
       {/* Modals Mapping */}
       {showProductModal && <AddProductModal onClose={() => setShowProductModal(false)} onAdd={handleAddItems} />}
       {showCustomModal && <AddCustomServiceModal onClose={() => setShowCustomModal(false)} onAdd={handleAddItems} />}
       {showTankyModal && <AddTankyProductModal onClose={() => setShowTankyModal(false)} onAdd={handleAddItems} />}
 
       {/* NAYE MODALS JO RENDER NAHI HO RAHE THE */}
-      <AddCreditModal 
-        show={showCreditModal} 
-        handleClose={() => setShowCreditModal(false)} 
+      <AddCreditModal
+        show={showCreditModal}
+        handleClose={() => setShowCreditModal(false)}
       />
-      <AddDebitModal 
-        show={showDebitModal} 
-        handleClose={() => setShowDebitModal(false)} 
+      <AddDebitModal
+        show={showDebitModal}
+        handleClose={() => setShowDebitModal(false)}
       />
 
     </div>

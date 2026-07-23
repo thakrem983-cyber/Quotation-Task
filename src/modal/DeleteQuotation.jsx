@@ -1,18 +1,7 @@
-import { useState } from "react";
 import "./DeleteQuotation.css";
 
-function DeleteQuotation({ closeModal, onDelete }) {
-  //const [showModal, setShowModal] = useState(true);
-
-  const quotationNo = "MECH202627-009";
-
-  const handleDelete = () => {
-    alert(`${quotationNo} deleted successfully.`);
-    closeModal();
-  };
-
-  //if (!showModal) return null;
-
+// Yahan props me 'quotationNo' add kiya hai
+function DeleteQuotation({ closeModal, onDelete, quotationNo }) { 
   return (
     <div className="delete-overlay">
       <div className="delete-modal">
@@ -30,9 +19,9 @@ function DeleteQuotation({ closeModal, onDelete }) {
           </p>
 
           <div className="Number">
+            {/* Ab yahan wahi number dikhega jis icon par click hua hai */}
             <h2>{quotationNo}</h2>
           </div>
-          {/* <h2>{quotationNo}</h2> */}
 
           <p className="delete-warning">This action cannot be undone.</p>
         </div>
@@ -42,6 +31,7 @@ function DeleteQuotation({ closeModal, onDelete }) {
             Cancel
           </button>
 
+          {/* Delete dabane par Parent wala API function chalega */}
           <button className="d-delete-btn" onClick={onDelete}>
             Delete
           </button>

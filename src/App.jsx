@@ -90,8 +90,7 @@ function App() {
     try {
       const response = await api.post("/quotations", payloadForBackend);
       console.log("Backend response:", response.data);
-      alert("Quotation Saved Successfully in Database!");
-
+      
       // Form clear karo
       setFormData({
         quotationType: "GST",
@@ -125,10 +124,14 @@ function App() {
       });
 
       setNotes("");
+
+      // 🔴 SABSE ZAROORI LINE: Yeh response return karega taaki AddQuot me file upload ho sake
+      return response; 
+      
     } catch (error) {
       console.error("Backend error:", error.response?.data || error.message);
       alert("Error saving quotation in database.");
-      throw error; // AddQuot ko batane ke liye ki error aayi hai
+      throw error; 
     }
   };
 
@@ -185,7 +188,7 @@ function App() {
             setSummary={setSummary}
             notes={notes}
             setNotes={setNotes}
-            handleCreate={handleSave} // <-- Yahan App.js ka handleSave pass kiya hai
+            handleCreate={handleSave} // <-- Yahan se handleSave call hoga jo response return karega
             handleCancel={handleCancel}
             setValidateQuotation={setValidateQuotation}
             setValidateProducts={setValidateProducts}
@@ -194,43 +197,22 @@ function App() {
       />
       <Route path="/quotation-template" element={<QuotationTemplate />} />
 
-      <Route 
-    path="/addquotation" 
-    element={
-      <AddQuot 
-        formData={formData}
-        setFormData={setFormData}
-        products={products}
-        setProducts={setProducts}
-        summary={summary}
-        setSummary={setSummary}
-        notes={notes}
-        setNotes={setNotes}
-        handleCreate={handleSave}
-        handleCancel={handleCancel}
-        setValidateQuotation={setValidateQuotation}
-        setValidateProducts={setValidateProducts}
-      />
-    } 
-  />
+      {/* 🔴 EDIT QUOTATION */}
+      <Route path="/editquotation/:id" element={<EditQuotation />} />
 
-  <Route path="/quotation-template" element={<QuotationTemplate />} />
+      {/* View Quotation */}
+      <Route path="/view/:id" element={<View />} />
 
-  {/* 🔴 EDIT QUOTATION (Ab ye :id accept karega) */}
-  <Route path="/editquotation/:id" element={<EditQuotation />} />
+      {/* Other routes */}
+      <Route path="/addproduct" element={<AddProductItems />} />
+      <Route path="/approve-quotation" element={<ApproveQuotation />} />
+      <Route path="/customer-service" element={<CustomerService />} />
+      <Route path="/add-tanky-product" element={<AddTankyProduct />} />
+      <Route path="/add-service" element={<AddService />} />
 
-  {/* View Quotation */}
-  <Route path="/view/:id" element={<View />} />
-
-  {/* Other routes */}
-  <Route path="/addproduct" element={<AddProductItems />} />
-  <Route path="/approve-quotation" element={<ApproveQuotation />} />
-  <Route path="/customer-service" element={<CustomerService />} />
-  <Route path="/add-tanky-product" element={<AddTankyProduct />} />
-  <Route path="/add-service" element={<AddService />} />
-
-   <Route
-        path="//client-financeMain/create"
+      {/* Typo theek kiya (// ki jagah / kar diya) */}
+      <Route
+        path="/client-financeMain/create"
         element={<ClientFinanceMain />}
       />
 
@@ -239,8 +221,6 @@ function App() {
         element={<ClientFinance />}
       />
 
-
-    
     </Routes>
   );
 }

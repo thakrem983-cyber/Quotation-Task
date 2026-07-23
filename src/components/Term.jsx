@@ -8,9 +8,11 @@ function TermsSection({
   setNotes,
   handleSave,
   handleCancel,
+  formData = {}, // formData lena zaroori hai checkbox ke liye
+  setFormData,   // formData update karne ke liye
   isView = false,
-  saveButtonText = "Save",   // Default "Save" rahega agar koi pass nahi karega
-  cancelButtonText = "Cancel" // Default "Cancel" rahega
+  saveButtonText = "Save",   
+  cancelButtonText = "Cancel" 
 }) {
   const [files, setFiles] = useState([]);
 
@@ -33,7 +35,6 @@ function TermsSection({
     }
 
     setFiles([...files, ...validFiles]);
-
     e.target.value = "";
   };
 
@@ -56,6 +57,9 @@ function TermsSection({
         <div className="col-md-7">
           <h5 className="mb-3">Terms & Conditions</h5>
 
+          {/* ... (Terms ke saare div waise hi rahenge) ... */}
+          {/* Main seedha neeche checkbox wale part par aata hoon */}
+          
           <div className="term-row">
             {editingIndex === 0 ? (
               <textarea
@@ -172,6 +176,7 @@ function TermsSection({
             className="form-control mt-3"
             rows="4"
             placeholder="Add extra notes (optional)"
+            disabled={isView}
           />
 
           <div className="mt-4 d-flex align-items-center gap-3">
@@ -181,22 +186,24 @@ function TermsSection({
                 type="checkbox"
                 id="save"
                 disabled={isView}
+                // Checkbox formData se connect ho gaya
+                checked={formData?.isSaveAsTemplate || false} 
+                onChange={(e) => setFormData && setFormData({ ...formData, isSaveAsTemplate: e.target.checked })} 
               />
               <label className="form-check-label" htmlFor="save">
                 Save as template
               </label>
             </div>
 
-            {/* Yahan humne text ko dynamic kar diya */}
             <button
               className="btn btn-warning text-white rounded-3 px-4 py-2"
-              onClick={handleSave}
+              // DHYAN DE: Yahan onClick me hum e (event) ke sath files (array) bhi bhej rahe hain
+              onClick={(e) => handleSave(e, files)} 
               disabled={isView}
             >
               {saveButtonText}
             </button>
 
-            {/* Yahan bhi text dynamic ho gaya */}
             <button
               className="btn btn-outline-warning rounded-3 px-4 py-2"
               onClick={handleCancel}

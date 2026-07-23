@@ -107,18 +107,28 @@ function Quotation() {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
-    setUsers((prevUsers) => {
-      const updatedUsers = prevUsers.filter((user) => user.id !== selectedId);
+const confirmDelete = async () => { // <-- async add kiya API call ke liye
+    try {
+      // 1. Backend ko Delete request bhejo (Database se hatane ke liye)
+      await api.delete(`/quotations/${selectedId}`);
 
-      console.log("Updated Users:", updatedUsers);
+      // 2. Backend se delete hone ke baad, Frontend (Table) se hatao
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== selectedId));
 
-      return updatedUsers;
-    });
-
-    setShowDeleteModal(false);
-    setSelectedId(null);
+      // 3. Modal band karo aur ID clear karo
+      setShowDeleteModal(false);
+      setSelectedId(null);
+      
+      // (Optional) Success message dikhao
+      alert("Quotation deleted successfully!");
+      
+    } catch (error) {
+      console.error(" error :", error);
+      alert("Failed to delete quotation. Please try again.");
+    }
   };
+
+   
 
   const confirmApprove = () => {
     setUsers((prevUsers) =>
@@ -288,10 +298,15 @@ function Quotation() {
             ))}
           </tbody>
         </table>
-        {showDeleteModal && (
+      {showDeleteModal && (
           <DeleteQuotation
-            closeModal={() => setShowDeleteModal(false)}
+            closeModal={() => {
+              setShowDeleteModal(false);
+              setSelectedId(null);
+            }}
             onDelete={confirmDelete}
+            // Yahan hum selectedId ke basis par uska Quotation Number dhundh kar bhej rahe hain
+            quotationNo={users.find(u => u.id === selectedId)?.quotation} 
           />
         )}
 
