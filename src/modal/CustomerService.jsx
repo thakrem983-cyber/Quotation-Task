@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./CustomerService.css";
 import { FaTrash } from "react-icons/fa";
 
-// function CustomerService({ closeModal }) {
+
 function CustomerService({
   closeModal,
   products: mainProducts,

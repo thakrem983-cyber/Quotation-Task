@@ -3,33 +3,70 @@ import { FaPlus, FaEdit, FaTrash, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./QuotationTemplate.css";
 
+
+const API_URL = "http://localhost:5000/api/quotations"; 
+
 function QuotationTemplate() {
   const navigate = useNavigate();
   const [savedTemplates, setSavedTemplates] = useState([]);
 
-  // LocalStorage se saved templates load karo
-  const loadTemplates = () => {
-    const data = JSON.parse(localStorage.getItem("quotationTemplates")) || [];
-    setSavedTemplates(data);
+  
+  const loadTemplates = async () => {
+    try {
+      const response = await fetch(API_URL);
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Backend se aaya poora data:", result);
+
+        
+        const allData = result.data || result.quotations || result;
+
+        if (Array.isArray(allData)) {
+          
+          const templatesOnly = allData.filter((item) => item.saveAsTemplate === true);
+          setSavedTemplates(templatesOnly);
+        } else {
+          console.error("Backend se array nahi mila:", allData);
+          setSavedTemplates([]);
+        }
+      } else {
+        console.error("Failed to fetch templates");
+      }
+    } catch (error) {
+      console.error("Error loading templates:", error);
+    }
   };
 
   useEffect(() => {
     loadTemplates();
   }, []);
 
-  // Delete Handler
-  const handleDelete = (e, id) => {
-    e.stopPropagation(); // Card click triggers na ho
-    if (window.confirm("you wants to delete this  templeate")) {
-      const updatedList = savedTemplates.filter((item) => item.id !== id);
-      setSavedTemplates(updatedList);
-      localStorage.setItem("quotationTemplates", JSON.stringify(updatedList));
+ 
+  const handleDelete = async (e, id) => {
+    e.stopPropagation(); 
+    
+    if (window.confirm("Do you want to delete this template?")) {
+      try {
+        const response = await fetch(`${API_URL}/${id}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+         
+          const updatedList = savedTemplates.filter((item) => item._id !== id && item.id !== id);
+          setSavedTemplates(updatedList);
+        } else {
+          alert("Failed to delete template from server.");
+        }
+      } catch (error) {
+        console.error("Error deleting template:", error);
+      }
     }
   };
 
   return (
     <div className="container py-4">
-      {/* Header */}
+     
       <div className="d-flex align-items-center mb-4">
         <FaArrowLeft
           className="me-3"
@@ -40,7 +77,7 @@ function QuotationTemplate() {
       </div>
 
       <div className="row g-4">
-        {/* 1. Blank Quotation Card */}
+        
         <div className="col-lg-3 col-md-4">
           <div
             className="card template-card shadow-sm border-0 h-100"
@@ -56,10 +93,10 @@ function QuotationTemplate() {
           </div>
         </div>
 
-        {/* 2. Dynamically Created Saved Templates */}
+        
         {savedTemplates.length > 0 &&
           savedTemplates.map((item) => (
-            <div className="col-lg-3 col-md-4" key={item.id}>
+            <div className="col-lg-3 col-md-4" key={item._id || item.id}> 
               <div 
                 className="card template-card shadow-sm border-0 h-100"
                 style={{ cursor: "pointer", minHeight: "220px" }}
@@ -69,14 +106,13 @@ function QuotationTemplate() {
                   className="template-preview bg-light d-flex flex-column justify-content-center align-items-center p-3 text-center flex-grow-1"
                 >
                   <h6 className="text-dark fw-bold mb-1">
-                    {item.quotationName || "Untitled Quotation"}
+                    {item.quotationName || item.clientName || "Untitled Quotation"}
                   </h6>
-                 
                 </div>
 
                 <div className="template-footer d-flex justify-content-between align-items-center p-3 bg-white border-top">
                   <h6 className="text-truncate mb-0 fw-semibold text-dark" style={{ maxWidth: "60%" }}>
-                    {item.quotationName || "Untitled"}
+                    {item.quotationName || item.clientName || "Untitled"}
                   </h6>
 
                   <div className="d-flex gap-2">
@@ -94,7 +130,7 @@ function QuotationTemplate() {
                     <button
                       className="btn btn-warning btn-sm text-white"
                       title="Delete"
-                      onClick={(e) => handleDelete(e, item.id)}
+                      onClick={(e) => handleDelete(e, item._id || item.id)}
                     >
                       <FaTrash />
                     </button>

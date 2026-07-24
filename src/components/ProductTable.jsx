@@ -41,7 +41,7 @@ function ProductTable({
           <thead className="table-light">
             <tr>
               <th>S.NO</th>
-              <th>IMAGE</th>
+              <th className="text-center">IMAGE</th>
               <th>PRODUCT NAME</th>
               <th>CODE</th>
               <th>UNIT</th>
@@ -57,9 +57,9 @@ function ProductTable({
               <tr key={product.id}>
                 <td>{index + 1}</td>
 
-                <td>
+                <td className="text-center">
                   {product.isEditing ? (
-                    <div className="text-center">
+                    <div className="d-flex flex-column align-items-center">
                       <label
                         htmlFor={`image-${product.id}`}
                         style={{ cursor: "pointer" }}
@@ -85,7 +85,6 @@ function ProductTable({
                               display: "flex",
                               justifyContent: "center",
                               alignItems: "center",
-                              margin: "auto",
                               fontSize: "20px",
                               color: "#999",
                             }}
@@ -252,9 +251,15 @@ function ProductTable({
                   )}
                 </td>
 
-               <td>₹{(Number(product.amount) || 0).toFixed(2)}</td>
+                <td>
+                  ₹
+                  {(
+                    Number(product.amount) ||
+                    Number(product.total) ||
+                    Number(product.price || 0) * Number(product.quantity || 0)
+                  ).toFixed(2)}
+                </td>
 
-             
                 <td>
                   {!isView && (
                     <div className="d-flex justify-content-center gap-3">

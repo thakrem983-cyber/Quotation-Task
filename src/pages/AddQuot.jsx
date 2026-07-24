@@ -7,7 +7,7 @@ import TermsSection from "../components/Term";
 import "@fontsource/poppins";
 import "../App.css";
 
-// 🔴 Zaroori: Apni API file import karna mat bhoolna
+
 import api from "../api/api"; 
 
 function AddQuot({
@@ -27,77 +27,107 @@ function AddQuot({
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 🔴 AGAR TEMPLATE CARD PAR CLICK KARKE AAYE HAIN TOH DATA AUTOFILL KARO
+  
   useEffect(() => {
     if (location.state && location.state.templateData) {
       const { templateData } = location.state;
-      if (templateData.formData) setFormData(templateData.formData);
-      if (templateData.products) setProducts(templateData.products);
-      if (templateData.summary) setSummary(templateData.summary);
-      if (templateData.notes) setNotes(templateData.notes);
-    }
-  }, [location.state]);
+      
+      
+      let formattedDate = "";
+      if (templateData.date) {
+        formattedDate = templateData.date.split("T")[0];
+      } else if (templateData.createdAt) {
+        formattedDate = templateData.createdAt.split("T")[0];
+      }
 
-  // 🔴 CREATE, TEMPLATE SAVE & UPLOAD HANDLER
-  // Yahan hum (e) ke sath (uploadedFiles) array bhi receive kar rahe hain
+      
+      setFormData((prev) => ({
+        ...prev,
+        quotationType: templateData.quotationType || "",
+        quotationNumber: templateData.quotationNumber || "", 
+        date: formattedDate, 
+        quotationDate: formattedDate, 
+        clientName: templateData.clientName || templateData.customerName || "", 
+        subject: templateData.subject || "",
+       
+        quotationName: templateData.quotationName || "", 
+        termsAndConditions: templateData.termsAndConditions || "",
+      }));
+
+      
+      if (templateData.products && templateData.products.length > 0) {
+        setProducts(templateData.products);
+      }
+
+      
+      setSummary({
+        discount: templateData.discount || 0,
+        cgst: templateData.cgst || 0,
+        sgst: templateData.sgst || 0,
+        other: templateData.other || 0,
+        subTotal: templateData.subTotal || 0,
+        grandTotal: templateData.grandTotal || 0,
+      });
+
+      
+      if (templateData.notes) {
+        setNotes(templateData.notes);
+      }
+    }
+  }, [location.state, setFormData, setProducts, setSummary, setNotes]);
+
+  
   const customCreateHandler = async (e, uploadedFiles = []) => {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
 
-    // 1. Proper Checkbox Check (Testing wala true hata diya)
     const isSaveAsTemplate = formData?.isSaveAsTemplate === true;
 
-    // 2. Sirf tabhi Template save hoga jab tick laga hoga
     if (isSaveAsTemplate) {
-      console.log("Saving Template... Data:", { formData, products, summary, notes });
-      const newTemplate = {
-        id: Date.now(),
-        quotationName: formData?.quotationName || formData?.quotation_name || formData?.quotationNumber || "Custom Quotation",
-        formData: formData || {},
+      console.log("Saving Template to Database...");
+      
+     
+      const templatePayload = {
+        ...formData,          
+        ...summary,           
         products: products || [],
-        summary: summary || {},
         notes: notes || "",
+        saveAsTemplate: true,    
+        quotationName: formData?.quotationName || formData?.quotation_name || formData?.quotationNumber || "Custom Quotation"
       };
 
       try {
-        const existingTemplates = JSON.parse(localStorage.getItem("quotationTemplates")) || [];
-        existingTemplates.push(newTemplate);
-        localStorage.setItem("quotationTemplates", JSON.stringify(existingTemplates));
-        console.log("Successfully saved in LocalStorage!");
+        await api.post("/quotations", templatePayload);
+        console.log("Successfully saved Template in Database!");
       } catch (error) {
-        console.error("LocalStorage Error:", error);
+        
+        console.error("Database Template Error:", error.response?.data || error.message);
+        alert(`Template save nahi hua: ${error.response?.data?.message || "Format mismatch"}`);
       }
     }
-
-    // 3. Asli Quotation aur Files Backend par Save karne ka Logic
+    
+    
     try {
       let newQuotationId = null;
 
-      // A) Pehle Quotation save karo (handleCreate ke through)
+      
       if (handleCreate) {
-        // Bhai, dhyan rakhna ki aapka parent component mein jo handleCreate hai, 
-        // wo backend se Quotation save hone ke baad uska ID return kare.
         const response = await handleCreate(e);
-        
-        // Response se ID nikalne ka fallback logic
-       newQuotationId = response?.data?._id || response?.data?.id || response?.data?.data?._id;
+        newQuotationId = response?.data?._id || response?.data?.id || response?.data?.data?._id;
       }
 
-      // B) Agar Quotation save ho gaya aur user ne files daali hain, toh File Upload chalao
+      
       if (newQuotationId && uploadedFiles.length > 0) {
         console.log(`Uploading ${uploadedFiles.length} files to backend...`);
-        console.log("Extracted Quotation ID:", newQuotationId);
-        
-        // Loop chala kar ek-ek file backend bhejenge (Kyunki backend pe upload.single hai)
         for (let i = 0; i < uploadedFiles.length; i++) {
           const formPayload = new FormData();
-          formPayload.append("attachment", uploadedFiles[i]); // "attachment" naam backend se match karna chahiye
+          formPayload.append("attachment", uploadedFiles[i]);
 
           try {
             await api.post(`/upload/${newQuotationId}`, formPayload, {
               headers: {
-                "Content-Type": "multipart/form-data", // Files ke liye zaroori header
+                "Content-Type": "multipart/form-data", 
               },
             });
             console.log(`File ${i + 1} uploaded successfully!`);
@@ -107,9 +137,9 @@ function AddQuot({
         }
       }
 
-      // 4. Sab successful hone ke baad Explicitly Navigate karo
+      
       alert("Quotation saved successfully!");
-      navigate("/quotation-template"); // Ya jahan bhi aap bhejte ho
+      navigate("/quotation-template"); 
 
     } catch (err) {
       console.error("Save karte time error aayi:", err);
@@ -127,14 +157,12 @@ function AddQuot({
   return (
     <div className="container py-4">
       <Header />
-
       <QuotationForm
         heading="Create Quotation"
         formData={formData}
         setFormData={setFormData}
         setValidateQuotation={setValidateQuotation}
       />
-
       <ProductSection
         products={products}
         setProducts={setProducts}
@@ -144,13 +172,12 @@ function AddQuot({
         setValidateProducts={setValidateProducts}
       />
       <hr />
-
       <TermsSection
         notes={notes}
         setNotes={setNotes}
         formData={formData}
         setFormData={setFormData}
-        handleSave={customCreateHandler} // Yahan se file receive hongi upar wale function me
+        handleSave={customCreateHandler} 
         handleCancel={customCancelHandler}
         saveButtonText="Create" 
         cancelButtonText="Cancel"

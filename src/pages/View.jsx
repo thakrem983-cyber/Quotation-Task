@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // URL se ID nikalne ke liye
+import { useParams } from "react-router-dom"; 
 import Header from "../components/Header";
 import QuotationForm from "../components/QuotationForm";
 import ProductSection from "../components/ProductSection";
 import TermsSection from "../components/Term";
-import api from "../api/api"; // Apni API file ka path check kar lena
+import api from "../api/api"; 
 
 function View() {
-  const { id } = useParams(); // URL me jo ID aayegi wo yahan milegi
+  const { id } = useParams(); 
   const [loading, setLoading] = useState(true);
 
-  // Local state banayenge API se aaye hue data ko store karne ke liye
+  
   const [formData, setFormData] = useState({
     quotationType: "",
     quotationNumber: "",
@@ -32,7 +32,7 @@ function View() {
   
   const [notes, setNotes] = useState("");
 
-  // Page load hote hi backend se data mangwayenge
+  
   useEffect(() => {
     if (id) {
       fetchQuotationDetails();
@@ -44,18 +44,18 @@ function View() {
       const response = await api.get(`/quotations/${id}`);
       const backendData = response.data.data;
 
-      // 1. Form Data Set karna (Backend ke data ko Frontend Format me)
+      
       setFormData({
         quotationType: backendData.quotationType || "GST",
         quotationNumber: backendData.quotationNumber || "",
         quotationName: "",
-        date: new Date(backendData.createdAt).toISOString().split("T")[0], // YYYY-MM-DD
-        title: "MR", // Default title
+        date: new Date(backendData.createdAt).toISOString().split("T")[0], 
+        title: "MR", 
         clientName: backendData.clientName || "",
         subject: backendData.subject || "",
       });
 
-      // 2. Products Set karna
+    
       const mappedProducts = backendData.products.map((p, index) => ({
         id: index + 1,
         productName: p.productName,
@@ -64,12 +64,11 @@ function View() {
         price: p.price,
         quantity: p.quantity,
         amount: p.total,
-        isEditing: false, // View mode me ye hamesha false hoga
-        image: null,
+        isEditing: false, 
       }));
       setProducts(mappedProducts);
 
-      // 3. Summary Set karna
+     
       setSummary({
         discount: backendData.discount || 0,
         cgst: backendData.cgst || 0,
@@ -77,7 +76,7 @@ function View() {
         other: backendData.other || 0,
       });
 
-      // 4. Notes Set karna
+      
       setNotes(backendData.notes || "");
       
       setLoading(false);
@@ -98,7 +97,7 @@ function View() {
       <QuotationForm
         heading="View Quotation"
         formData={formData}
-        isView={true} // Ye tere form ko read-only (disable) kar dega
+        isView={true} 
       />
 
       <ProductSection

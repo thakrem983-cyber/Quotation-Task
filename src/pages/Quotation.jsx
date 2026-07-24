@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // useEffect add kiya
+import { useState, useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -6,7 +6,7 @@ import "./index.css";
 import EditQuotation from "./EditQuotation";
 import DeleteQuotation from "../modal/DeleteQuotation";
 import ApproveQuotation from "../modal/ApproveQuotation";
-import api from "../api/api"; // <-- APNI AXIOS WALI FILE YAHAN IMPORT KAR
+import api from "../api/api"; 
 
 import {
   FaEye,
@@ -31,36 +31,36 @@ function Quotation() {
   const [entries, setEntries] = useState(10);
   const [typeFilter, setTypeFilter] = useState("All");
   const [selectedUsers, setSelectedUsers] = useState([]);
-// 1. Users ko starting mein khali (empty array) rakhenge
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state add ki
 
-  // 2. Page load hote hi backend se data mangwane ke liye useEffect
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true); 
+
+  
   useEffect(() => {
     fetchQuotations();
   }, []);
 
   const fetchQuotations = async () => {
     try {
-      // Backend ke '/api/quotations' route par GET request bhej rahe hain
+     
       const response = await api.get("/quotations");
       
-      // Backend se jo data aaya (response.data.data array)
+    
       const backendData = response.data.data;
 
-      // 3. Backend ke data ko tere frontend wale format mein badal (map) rahe hain
+      
       const formattedData = backendData.map((item) => ({
-        id: item._id, // MongoDB humesha '_id' deta hai
-        name: item.clientName, // Tere backend mein ye clientName hai
+        id: item._id, 
+        name: item.clientName, 
         quotation: item.quotationNumber,
-        date: new Date(item.createdAt).toLocaleDateString(), // Date ko format kiya
+        date: new Date(item.createdAt).toLocaleDateString(),
         advance: item.amountReceived ? `₹${item.amountReceived}` : "₹0.00",
         total: `₹${item.grandTotal.toFixed(2)}`,
         status: item.status,
-        type: item.quotationType // Ye tere filter (Cash/GST) ke liye zaroori hai
+        type: item.quotationType 
       }));
 
-      // 4. State mein data save kar diya
+      
       setUsers(formattedData);
       setLoading(false);
     } catch (error) {
@@ -80,13 +80,7 @@ function Quotation() {
     return matchesSearch && matchesType;
   });
 
-  //   const handleStatusChange = (id, newStatus) => {
-  //     setUsers(
-  //       users.map((user) =>
-  //         user.id === id ? { ...user, status: newStatus } : user,
-  //       ),
-  //     );
-  //   };
+  
 
   const handleStatusChange = (id, newStatus) => {
     if (newStatus === "Approved") {
@@ -107,19 +101,19 @@ function Quotation() {
     setShowDeleteModal(true);
   };
 
-const confirmDelete = async () => { // <-- async add kiya API call ke liye
+const confirmDelete = async () => { 
     try {
-      // 1. Backend ko Delete request bhejo (Database se hatane ke liye)
+      
       await api.delete(`/quotations/${selectedId}`);
 
-      // 2. Backend se delete hone ke baad, Frontend (Table) se hatao
+      
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== selectedId));
 
-      // 3. Modal band karo aur ID clear karo
+     
       setShowDeleteModal(false);
       setSelectedId(null);
       
-      // (Optional) Success message dikhao
+      
       alert("Quotation deleted successfully!");
       
     } catch (error) {
@@ -305,7 +299,7 @@ const confirmDelete = async () => { // <-- async add kiya API call ke liye
               setSelectedId(null);
             }}
             onDelete={confirmDelete}
-            // Yahan hum selectedId ke basis par uska Quotation Number dhundh kar bhej rahe hain
+            
             quotationNo={users.find(u => u.id === selectedId)?.quotation} 
           />
         )}
@@ -316,20 +310,16 @@ const confirmDelete = async () => { // <-- async add kiya API call ke liye
             quotationId={approveId} 
             quotationNumber={users.find(u => u.id === approveId)?.quotation}
             
-            // Ye function popup me 'Save' hone ke baad chalega
+            
             onApprove={() => {
-              // Option 1: Frontend ke table me turant status badal do (Fastest)
+              
               setUsers((prevUsers) => 
                 prevUsers.map((user) => 
                   user.id === approveId ? { ...user, status: "Approved" } : user
                 )
               );
               
-              // Option 2: Agar tune table ka data backend se laane ke liye 
-              // koi function banaya hai (jaise fetchQuotations), toh tu usko bhi call kar sakta hai.
-              // fetchQuotations(); 
-
-              // setShowApproveModal(false);
+              
             }}
           />
         )}

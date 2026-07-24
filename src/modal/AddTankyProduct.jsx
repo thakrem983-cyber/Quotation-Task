@@ -1,7 +1,7 @@
 import "./AddTankyProduct.css";
 import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
-//import
+
 import api from "../api/api";
 
 function AddTankyProduct({
@@ -14,7 +14,6 @@ function AddTankyProduct({
   const [category, setCategory] = useState("");
   const [selectAll, setSelectAll] = useState(false);
   const [tankyProducts, setTankyProducts] = useState([]);
-
 
   useEffect(() => {
     fetchProducts();
@@ -89,7 +88,7 @@ function AddTankyProduct({
         id: item.id,
         productId: item.id,
         productName: item.name,
-        code: item.productCode,
+
         unit: item.unit,
         price: item.price,
         quantity: item.quantity,
@@ -123,18 +122,13 @@ function AddTankyProduct({
   const filteredProducts = tankyProducts.filter((item) => {
     const searchMatch = item.name.toLowerCase().includes(search.toLowerCase());
 
-    const categoryMatch =
-      category === "" ||
-      item.category?.includes(category);
+    const categoryMatch = category === "" || item.category?.includes(category);
 
     return searchMatch && categoryMatch;
   });
 
-
   const categories = [
-    ...new Set(
-      tankyProducts.flatMap((item) => item.category || [])
-    ),
+    ...new Set(tankyProducts.flatMap((item) => item.category || [])),
   ];
 
   return (
@@ -174,7 +168,6 @@ function AddTankyProduct({
                 </option>
               ))}
             </select>
-
           </div>
 
           <div className="table-area">
@@ -203,25 +196,27 @@ function AddTankyProduct({
                         type="checkbox"
                         checked={item.checked}
                         onChange={() => {
-                          const updatedProducts = tankyProducts.map((product) =>
-                            product.id === item.id
-                              ? {
-                                ...product,
-                                checked: !product.checked,
-                                quantity: !product.checked ? 1 : 0, // checked => 1, unchecked => 0
-                              }
-                              : product
+                          const updatedProducts = tankyProducts.map(
+                            (product) =>
+                              product.id === item.id
+                                ? {
+                                    ...product,
+                                    checked: !product.checked,
+                                    quantity: !product.checked ? 1 : 0, // checked => 1, unchecked => 0
+                                  }
+                                : product,
                           );
 
                           setTankyProducts(updatedProducts);
 
-                          setSelectAll(updatedProducts.every((product) => product.checked));
+                          setSelectAll(
+                            updatedProducts.every((product) => product.checked),
+                          );
                         }}
                       />
                     </td>
 
                     <td className="product-name">
-
                       <img
                         src={
                           item.image
@@ -232,7 +227,6 @@ function AddTankyProduct({
                         width={35}
                         height={35}
                       />
-
 
                       <span>{item.name}</span>
                     </td>

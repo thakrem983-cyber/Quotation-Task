@@ -20,11 +20,9 @@ function AddDebitModal({ show, handleClose }) {
           <Form.Group className="mb-3">
             <Form.Label>Date</Form.Label>
             <div className="date-wrapper">
-              <Form.Control
-                type="text"
-                placeholder="14 Jul, 2026"
-              />
-              <button className="calendar-btn" type="button">
+              <Form.Control type="date" defaultValue="2026-07-14" />
+
+              <button type="button" className="calendar-btn">
                 <FaCalendarAlt />
               </button>
             </div>
@@ -32,20 +30,14 @@ function AddDebitModal({ show, handleClose }) {
 
           <Form.Group className="mb-3">
             <Form.Label>Purpose</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter purpose"
-            />
+            <Form.Control type="text" placeholder="Enter purpose" />
           </Form.Group>
 
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
                 <Form.Label>Amount Paid</Form.Label>
-                <Form.Control
-                  type="number"
-                  placeholder="₹ 0"
-                />
+                <Form.Control type="number" placeholder="₹ 0" />
               </Form.Group>
             </Col>
 
@@ -64,9 +56,7 @@ function AddDebitModal({ show, handleClose }) {
 
           <Form.Group className="mb-3">
             <Form.Label>Beneficiary Name</Form.Label>
-            <Form.Control
-              placeholder="Enter beneficiary name"
-            />
+            <Form.Control placeholder="Enter beneficiary name" />
           </Form.Group>
 
           <Row>
@@ -86,9 +76,7 @@ function AddDebitModal({ show, handleClose }) {
             <Col md={6}>
               <Form.Group>
                 <Form.Label>Transaction ID</Form.Label>
-                <Form.Control
-                  placeholder="Enter Transaction ID"
-                />
+                <Form.Control placeholder="Enter Transaction ID" />
               </Form.Group>
             </Col>
           </Row>

@@ -135,11 +135,6 @@ function ProductSection({
         alert("Please complete product details");
         return false;
       }
-
-      // if (product.isEditing) {
-      //   alert("Please save product details first");
-      //   return false;
-      // }
     }
 
     return true;
@@ -152,23 +147,29 @@ function ProductSection({
   }, [products, setValidateProducts]);
 
   const productsTotal = products.reduce((total, product) => {
-    return total + product.amount;
-  }, 0);
-  const discountAmount = (productsTotal * summary.discount) / 100;
+    const itemTotal =
+      Number(product.amount) ||
+      Number(product.total) ||
+      Number(product.price || 0) * Number(product.quantity || 0);
 
+    return total + itemTotal;
+  }, 0);
+
+  const safeDiscount = Number(summary.discount) || 0;
+  const safeCgst = Number(summary.cgst) || 0;
+  const safeSgst = Number(summary.sgst) || 0;
+  const safeOther = Number(summary.other) || 0;
+
+  const discountAmount = (productsTotal * safeDiscount) / 100;
   const taxableAmount = productsTotal - discountAmount;
 
   const cgstAmount =
-    formData.quotationType === "Cash"
-      ? 0
-      : (taxableAmount * summary.cgst) / 100;
+    formData?.quotationType === "Cash" ? 0 : (taxableAmount * safeCgst) / 100;
 
   const sgstAmount =
-    formData.quotationType === "Cash"
-      ? 0
-      : (taxableAmount * summary.sgst) / 100;
+    formData?.quotationType === "Cash" ? 0 : (taxableAmount * safeSgst) / 100;
 
-  const otherAmount = (taxableAmount * summary.other) / 100;
+  const otherAmount = (taxableAmount * safeOther) / 100;
 
   const finalAmount = taxableAmount + cgstAmount + sgstAmount + otherAmount;
 

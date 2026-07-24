@@ -11,10 +11,10 @@ import AddCreditModal from "../modal/AddCreditModal";
 import AddDebitModal from "../modal/AddDebitModal";
 import AddService from "../modal/AddService"; 
 
-function ClientFinance() {
+function EditClientFinance() {
   const navigate = useNavigate();
 
-  
+
   const [quotationType, setQuotationType] = useState("GST");
   const [quotationNo, setQuotationNo] = useState("");
   const [clientName, setClientName] = useState("");
@@ -36,19 +36,19 @@ function ClientFinance() {
 
   const [productMode, setProductMode] = useState(null);
 
-  
+
   const [products, setProducts] = useState([]);
   const [credits, setCredits] = useState([]);
   const [debits, setDebits] = useState([]);
 
- 
+  
   const [showProductModal, setShowProductModal] = useState(false);
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [showTankyModal, setShowTankyModal] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
   const [showDebitModal, setShowDebitModal] = useState(false);
   
-  
+ 
   const [showAddServiceModal, setShowAddServiceModal] = useState(false);
 
  
@@ -67,7 +67,7 @@ function ClientFinance() {
       code: item.code || "-",
       unit: item.unit || "-",
       price: Number(item.price) || 0,
-      quantity: Number(item.quantity) || item.qty || 1,
+      quantity: Number(item.quantity) || item.qty || 1, 
     }));
     setProducts(formattedProducts);
   };
@@ -76,7 +76,7 @@ function ClientFinance() {
     setProducts(products.filter((_, i) => i !== index));
   };
 
- 
+  
   const productsTotal = products.reduce((acc, curr) => acc + curr.quantity * curr.price, 0);
 
   const [discountPct, setDiscountPct] = useState("");
@@ -95,11 +95,11 @@ function ClientFinance() {
   const totalDebits = debits.reduce((acc, curr) => acc + Number(curr.amount), 0);
   const profit = totalCredits - totalDebits;
 
- 
+  
   const orangeBtnStyle = { backgroundColor: "#f58c22", color: "white", border: "none" };
   const orangeOutlineBtnStyle = { backgroundColor: "transparent", color: "#f58c22", border: "1px solid #f58c22" };
 
-  
+ 
   const handleCreate = () => {
     if (clientName.trim() === "") {
       alert("Client Name is required.");
@@ -127,19 +127,16 @@ function ClientFinance() {
     }
 
     alert("Client Finance Created Successfully!");
-    navigate("/client-finance-main");
   };
 
   return (
     <div className="container-fluid py-4 bg-white" style={{ minHeight: "100vh", fontSize: "14px" }}>
-     
+      
       <div className="d-flex align-items-center mb-2">
         <FaArrowLeft className="me-2 text-dark" style={{ cursor: "pointer" }} onClick={() => navigate(-1)} />
-        <h4 className="fw-bold mb-0 text-dark">Add client finance</h4>
+        <h4 className="fw-bold mb-0 text-dark">Edit client finance</h4>
       </div>
-      <p className="text-danger mb-4 fw-medium">⚠ Please approve quotation before creating client finance</p>
-
-    
+      
       <div className="row g-3 mb-5">
         <div className="col-md-4">
           <label className="form-label fw-bold">Quotation No <span className="text-danger">*</span></label>
@@ -210,7 +207,7 @@ function ClientFinance() {
           />
         </div>
 
-      
+     
         <div className="col-md-4">
           <label className="form-label fw-bold">Country</label>
           <select className="form-select shadow-none" value={selectedCountry} onChange={(e) => { setSelectedCountry(e.target.value); setSelectedState(""); setSelectedCity(""); }}>
@@ -251,7 +248,7 @@ function ClientFinance() {
         </div>
       </div>
 
-     
+      
       <div className="mb-5">
         <h5 className="fw-bold mb-3">Products <span className="text-danger">*</span></h5>
         <div className="table-responsive mb-3">
@@ -291,18 +288,18 @@ function ClientFinance() {
           </table>
         </div>
 
-  
+        
         <div className="row g-4">
           <div className="col-md-7 d-flex gap-2 align-items-start">
-            <button className="btn btn-light border text-dark d-flex align-items-center" disabled={productMode === "tanky"} onClick={() => { setProductMode("standard"); setShowProductModal(true); }}>
+            <button className="btn btn-light border fw-bold text-dark d-flex align-items-center" disabled={productMode === "tanky"} onClick={() => { setProductMode("standard"); setShowProductModal(true); }}>
               <FaPlus className="me-2 text-warning" /> Add product items
             </button>
 
-            <button className="btn btn-light border text-dark d-flex align-items-center" disabled={productMode === "tanky"} onClick={() => { setProductMode("standard"); setShowCustomModal(true); }}>
+            <button className="btn btn-light border fw-bold text-dark d-flex align-items-center" disabled={productMode === "tanky"} onClick={() => { setProductMode("standard"); setShowCustomModal(true); }}>
               <FaPlus className="me-2 text-warning" /> Custom Service
             </button>
 
-            <button className="btn btn-light border text-dark d-flex align-items-center" disabled={productMode === "standard"} onClick={() => { setProductMode("tanky"); setShowTankyModal(true); }}>
+            <button className="btn btn-light border fw-bold text-dark d-flex align-items-center" disabled={productMode === "standard"} onClick={() => { setProductMode("tanky"); setShowTankyModal(true); }}>
               <FaPlus className="me-2 text-warning" /> Add Tanky Product Items
             </button>
           </div>
@@ -387,7 +384,7 @@ function ClientFinance() {
         </button>
       </div>
 
-     
+      
       <div className="mb-5">
         <h5 className="fw-bold mb-3">Total Debits</h5>
         <div className="table-responsive mb-3">
@@ -432,7 +429,7 @@ function ClientFinance() {
         </button>
       </div>
 
-  
+      
       {showProductModal && (
         <AddProductItems 
           closeModal={() => setShowProductModal(false)} 
@@ -477,4 +474,4 @@ function ClientFinance() {
   );
 }
 
-export default ClientFinance;
+export default EditClientFinance;

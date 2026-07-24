@@ -222,6 +222,7 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
                         className="qty-input"
                         value={quantities[product._id] || 0}
                         min="0"
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) =>
                           setQuantities((prev) => ({
                             ...prev,

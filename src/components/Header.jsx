@@ -5,32 +5,29 @@ function Header() {
 
   return (
     <div style={{ position: "relative" }}>
-      {/* 🔴 Top-Left Corner Back Arrow */}
       <button
         onClick={() => navigate(-1)}
         className="btn btn-light"
         style={{
           position: "absolute",
-          top: "-15px",     // Aur upar karne ke liye isko adjust kar sakte ho (-20px, etc.)
-          left: "-90px",    // Aur left karne ke liye isko adjust kar sakte ho (-20px, etc.)
-          // borderRadius: "50%",
+          top: "-15px",
+          left: "-90px",
           width: "50px",
           height: "50px",
           fontSize: "50px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          // border: "1px solid #ddd",
+
           cursor: "pointer",
-          zIndex: 10,       // Taaki click asani se ho sake
-          backgroundColor: "#fff"
+          zIndex: 10,
+          backgroundColor: "#fff",
         }}
         title="Go Back"
       >
         ←
       </button>
 
-      {/* Aapka Purana Header Layout */}
       <div className="row align-items-center">
         <div className="col-md-2">
           <img
@@ -43,11 +40,15 @@ function Header() {
 
         <div className="col-md-7">
           <h1>
-            <span className="text-warning" style={{ fontSize: "45px", fontWeight: "bold" }}>
+            <span
+              className="text-warning"
+              style={{ fontSize: "45px", fontWeight: "bold" }}
+            >
               Milestone
             </span>
             <span className="text-dark" style={{ fontSize: "50px" }}>
-              {" "}Enterprises
+              {" "}
+              Enterprises
             </span>
           </h1>
         </div>

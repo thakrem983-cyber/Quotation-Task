@@ -17,42 +17,28 @@ function AddCreditModal({ show, handleClose }) {
 
       <Modal.Body>
         <Form>
-          {/* Date */}
           <Form.Group className="mb-3">
             <Form.Label>Date</Form.Label>
 
             <div className="date-wrapper">
-              <Form.Control
-                type="text"
-                defaultValue="14 Jul, 2026"
-              />
+              <Form.Control type="date" defaultValue="2026-07-14" />
 
-              <button
-                type="button"
-                className="calendar-btn"
-              >
+              <button type="button" className="calendar-btn">
                 <FaCalendarAlt />
               </button>
             </div>
           </Form.Group>
 
-          {/* Amount */}
           <Form.Group className="mb-3">
             <Form.Label>Amount Received</Form.Label>
 
-            <Form.Control
-              type="number"
-              placeholder="₹ 0"
-            />
+            <Form.Control type="number" placeholder="₹ 0" />
           </Form.Group>
 
-          {/* Client */}
           <Form.Group className="mb-3">
             <Form.Label>Client Name</Form.Label>
 
-            <Form.Control
-              placeholder="Enter client name"
-            />
+            <Form.Control placeholder="Enter client name" />
           </Form.Group>
 
           <Row>
@@ -74,9 +60,7 @@ function AddCreditModal({ show, handleClose }) {
               <Form.Group>
                 <Form.Label>Transaction ID</Form.Label>
 
-                <Form.Control
-                  placeholder="Enter Transaction ID"
-                />
+                <Form.Control placeholder="Enter Transaction ID" />
               </Form.Group>
             </Col>
           </Row>
@@ -92,9 +76,7 @@ function AddCreditModal({ show, handleClose }) {
           Cancel
         </Button>
 
-        <Button 
-        variant="warning"
-        className="cdt-add-btn">
+        <Button variant="warning" className="cdt-add-btn">
           Add
         </Button>
       </Modal.Footer>

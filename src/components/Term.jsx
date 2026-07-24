@@ -8,11 +8,11 @@ function TermsSection({
   setNotes,
   handleSave,
   handleCancel,
-  formData = {}, // formData lena zaroori hai checkbox ke liye
-  setFormData,   // formData update karne ke liye
+  formData = {},
+  setFormData,
   isView = false,
-  saveButtonText = "Save",   
-  cancelButtonText = "Cancel" 
+  saveButtonText = "Save",
+  cancelButtonText = "Cancel",
 }) {
   const [files, setFiles] = useState([]);
 
@@ -41,7 +41,7 @@ function TermsSection({
   const removeFile = (index) => {
     setFiles(files.filter((_, i) => i !== index));
   };
-  
+
   const [terms, setTerms] = useState([
     "In case of any damage during transit or travel, Milestone Enterprises will not be held responsible.",
     "Supply will be made within 2 to 3 Weeks from the date of confirmed PO and full payment.",
@@ -57,9 +57,6 @@ function TermsSection({
         <div className="col-md-7">
           <h5 className="mb-3">Terms & Conditions</h5>
 
-          {/* ... (Terms ke saare div waise hi rahenge) ... */}
-          {/* Main seedha neeche checkbox wale part par aata hoon */}
-          
           <div className="term-row">
             {editingIndex === 0 ? (
               <textarea
@@ -187,8 +184,14 @@ function TermsSection({
                 id="save"
                 disabled={isView}
                 // Checkbox formData se connect ho gaya
-                checked={formData?.isSaveAsTemplate || false} 
-                onChange={(e) => setFormData && setFormData({ ...formData, isSaveAsTemplate: e.target.checked })} 
+                checked={formData?.isSaveAsTemplate || false}
+                onChange={(e) =>
+                  setFormData &&
+                  setFormData({
+                    ...formData,
+                    isSaveAsTemplate: e.target.checked,
+                  })
+                }
               />
               <label className="form-check-label" htmlFor="save">
                 Save as template
@@ -197,8 +200,7 @@ function TermsSection({
 
             <button
               className="btn btn-warning text-white rounded-3 px-4 py-2"
-              // DHYAN DE: Yahan onClick me hum e (event) ke sath files (array) bhi bhej rahe hain
-              onClick={(e) => handleSave(e, files)} 
+              onClick={(e) => handleSave(e, files)}
               disabled={isView}
             >
               {saveButtonText}

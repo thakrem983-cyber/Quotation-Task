@@ -9,11 +9,11 @@ import "@fontsource/poppins";
 import "../App.css";
 
 function EditQuotation() {
-  const { id } = useParams(); // URL se Quotation ID milegi
+  const { id } = useParams(); 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
-  // States
+  
   const [formData, setFormData] = useState({
     quotationType: "GST",
     quotationNumber: "",
@@ -36,7 +36,7 @@ function EditQuotation() {
   const [validateQuotation, setValidateQuotation] = useState(null);
   const [validateProducts, setValidateProducts] = useState(null);
 
-  // 1. Page load hote hi backend se current quotation load karo
+  
   useEffect(() => {
     if (id) {
       fetchQuotationDetails();
@@ -48,7 +48,7 @@ function EditQuotation() {
       const response = await api.get(`/quotations/${id}`);
       const backendData = response.data.data;
 
-      // Form Data Load
+   
       setFormData({
         quotationType: backendData.quotationType || "GST",
         quotationNumber: backendData.quotationNumber || "",
@@ -59,7 +59,7 @@ function EditQuotation() {
         subject: backendData.subject || "",
       });
 
-      // Products Load (Editable Mode me isEditing: true or false standard according)
+      
       const mappedProducts = (backendData.products || []).map((p, index) => ({
         id: p._id || index + 1,
         productName: p.productName || "",
@@ -68,12 +68,12 @@ function EditQuotation() {
         price: p.price || 0,
         quantity: p.quantity || 1,
         amount: p.total || p.amount || 0,
-        isEditing: true, // Edit mode me editable rakhne ke liye
+        isEditing: true,
         image: p.image || null,
       }));
       setProducts(mappedProducts);
 
-      // Summary Load
+      
       setSummary({
         discount: backendData.discount || 0,
         cgst: backendData.cgst || 0,
@@ -81,7 +81,7 @@ function EditQuotation() {
         other: backendData.other || 0,
       });
 
-      // Notes Load
+     
       setNotes(backendData.notes || "");
       setLoading(false);
     } catch (error) {
@@ -91,7 +91,7 @@ function EditQuotation() {
     }
   };
 
-  // 2. Data Update (PUT API Call)
+ 
   const handleUpdate = async () => {
     if (validateQuotation && !validateQuotation()) {
       alert("Please fill required form fields!");
