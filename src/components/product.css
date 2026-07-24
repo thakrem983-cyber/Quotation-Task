@@ -1,12 +1,12 @@
-.table thead th {
+.table-pr thead th {
   font-weight: 500 !important;
   text-transform: uppercase;
   letter-spacing: 0.7px;
   color: #7a7a7a;
   font-size: 13px;
 }
-.table th,
-.table td {
+.table-pr th,
+.table-pr td {
   padding: 16px 12px;
   vertical-align: middle;
 }

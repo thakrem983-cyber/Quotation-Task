@@ -2,77 +2,79 @@ import "./AddTankyProduct.css";
 import { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 
-function AddTankyProduct({ closeModal, openAddService }) {
+import api from "../api/api";
+
+function AddTankyProduct({
+  closeModal,
+  openAddService,
+  products: mainProducts,
+  setProducts,
+}) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [selectAll, setSelectAll] = useState(false);
+  const [tankyProducts, setTankyProducts] = useState([]);
 
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      image: "https://via.placeholder.com/35",
-      name: "Test Product45",
-      Category: "Cement",
-      unit: "bags",
-      quantity: 0,
-      description: "abcdefg",
-      checked: false,
-    },
-    {
-      id: 2,
-      image: "https://via.placeholder.com/35",
-      name: "Roofing materials",
-      Category: "Steel",
-      unit: "kilogram (kg)",
-      quantity: 0,
-      description: "shingles",
-      checked: false,
-    },
-    {
-      id: 3,
-      image: "https://via.placeholder.com/35",
-      name: "Test Product23",
-      category: "Paint",
-      unit: "bags",
-      quantity: 0,
-      description: "-",
-      checked: false,
-    },
-    {
-      id: 4,
-      image: "https://via.placeholder.com/35",
-      name: "Test Product",
-      unit: "Square Yards",
-      quantity: 0,
-      description: "-",
-      checked: false,
-    },
-  ]);
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await api.get("/products");
+
+      console.log("API Response:", res.data);
+
+      const formattedProducts = res.data.data.map((product) => ({
+        id: product._id,
+        image: product.image,
+        name: product.productName,
+        productCode: product.productCode,
+        category: product.category,
+        unit: product.unit,
+        quantity: 0,
+        price: product.price,
+        description: product.description || "-",
+        checked: false,
+      }));
+
+      console.log("Formatted Products:", formattedProducts);
+
+      setTankyProducts(formattedProducts);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleSelectAll = (e) => {
     const checked = e.target.checked;
 
     setSelectAll(checked);
 
-    const updatedProducts = products.map((item) => ({
+    const updatedProducts = tankyProducts.map((item) => ({
       ...item,
       checked: checked,
     }));
 
-    setProducts(updatedProducts);
+    setTankyProducts(updatedProducts);
   };
 
   const handleQuantity = (id, value) => {
-    const updatedProducts = products.map((item) => {
+    const qty = Number(value);
+
+    const updatedProducts = tankyProducts.map((item) => {
       if (item.id === id) {
         return {
           ...item,
-          quantity: value,
+          quantity: qty,
+          checked: qty > 0,
         };
       }
       return item;
     });
 
-    setProducts(updatedProducts);
+    setTankyProducts(updatedProducts);
+    setSelectAll(updatedProducts.every((item) => item.checked));
   };
 
   const handleCancel = () => {
@@ -80,16 +82,30 @@ function AddTankyProduct({ closeModal, openAddService }) {
   };
 
   const handleAdd = () => {
-    alert("Added Successfully");
+    const selectedProducts = tankyProducts
+      .filter((item) => item.checked && item.quantity > 0)
+      .map((item) => ({
+        id: item.id,
+        productId: item.id,
+        productName: item.name,
+
+        unit: item.unit,
+        price: item.price,
+        quantity: item.quantity,
+        amount: item.price * item.quantity,
+        isEditing: false,
+      }));
+
+    setProducts([...mainProducts, ...selectedProducts]);
     closeModal();
   };
 
   const handleAddService = () => {
-  openAddService();
-};
+    openAddService();
+  };
 
   const handleUnit = (id, value) => {
-    const updatedProducts = products.map((item) => {
+    const updatedProducts = tankyProducts.map((item) => {
       if (item.id === id) {
         return {
           ...item,
@@ -100,16 +116,20 @@ function AddTankyProduct({ closeModal, openAddService }) {
       return item;
     });
 
-    setProducts(updatedProducts);
+    setTankyProducts(updatedProducts);
   };
 
-  const filteredProducts = products.filter((item) => {
+  const filteredProducts = tankyProducts.filter((item) => {
     const searchMatch = item.name.toLowerCase().includes(search.toLowerCase());
 
-    const categoryMatch = category === "" || item.category === category;
+    const categoryMatch = category === "" || item.category?.includes(category);
 
     return searchMatch && categoryMatch;
   });
+
+  const categories = [
+    ...new Set(tankyProducts.flatMap((item) => item.category || [])),
+  ];
 
   return (
     <>
@@ -141,9 +161,12 @@ function AddTankyProduct({ closeModal, openAddService }) {
               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="">Select Category</option>
-              <option value="Cement">Cement</option>
-              <option value="Steel">Steel</option>
-              <option value="Paint">Paint</option>
+
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -173,16 +196,18 @@ function AddTankyProduct({ closeModal, openAddService }) {
                         type="checkbox"
                         checked={item.checked}
                         onChange={() => {
-                          const updatedProducts = products.map((product) =>
-                            product.id === item.id
-                              ? {
-                                  ...product,
-                                  checked: !product.checked,
-                                }
-                              : product,
+                          const updatedProducts = tankyProducts.map(
+                            (product) =>
+                              product.id === item.id
+                                ? {
+                                    ...product,
+                                    checked: !product.checked,
+                                    quantity: !product.checked ? 1 : 0, // checked => 1, unchecked => 0
+                                  }
+                                : product,
                           );
 
-                          setProducts(updatedProducts);
+                          setTankyProducts(updatedProducts);
 
                           setSelectAll(
                             updatedProducts.every((product) => product.checked),
@@ -192,7 +217,17 @@ function AddTankyProduct({ closeModal, openAddService }) {
                     </td>
 
                     <td className="product-name">
-                      <img src="src/assets/riding.jpg" alt="" />
+                      <img
+                        src={
+                          item.image
+                            ? `http://localhost:5000/uploads/${item.image}`
+                            : "https://via.placeholder.com/35"
+                        }
+                        alt={item.name}
+                        width={35}
+                        height={35}
+                      />
+
                       <span>{item.name}</span>
                     </td>
 

@@ -156,12 +156,30 @@ body {
   padding: 0 8px;
 }
 
+/* .qty-input {
+  width: 60px;
+  height: 36px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  text-align: center;
+} */
 .qty-input {
   width: 60px;
   height: 36px;
   border: 1px solid #ddd;
   border-radius: 5px;
   text-align: center;
+
+  /* Firefox */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Chrome, Edge, Safari */
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .footer {

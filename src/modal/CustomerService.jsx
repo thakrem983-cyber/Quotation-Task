@@ -2,7 +2,12 @@ import { useState } from "react";
 import "./CustomerService.css";
 import { FaTrash } from "react-icons/fa";
 
-function CustomerService({ closeModal }) {
+
+function CustomerService({
+  closeModal,
+  products: mainProducts,
+  setProducts,
+}) {
   const [services, setServices] = useState([
     {
       service: "",
@@ -83,16 +88,34 @@ function CustomerService({ closeModal }) {
   };
 
   const handleSubmit = () => {
-    if (!validate()) return;
-    alert("Added Successfully");
-    closeModal();
-  };
+  if (!validate()) return;
+
+  const serviceProducts = services.map((item) => ({
+    id: Date.now() + Math.random(),
+
+    productName: item.service,
+    code: "SERVICE",
+
+    unit: item.unit,
+    price: Number(item.price),
+
+    quantity: Number(item.quantity),
+
+    amount: Number(item.price) * Number(item.quantity),
+
+    isEditing: false,
+  }));
+
+  setProducts([...mainProducts, ...serviceProducts]);
+
+  closeModal();
+};
 
   return (
     <>
       <div className="service-overlay">
         <div className="service-modal">
-          <div className="modal-header">
+          <div className="custom-modal-header">
             <h3>Custom Service</h3>
             <button className="close-icon" onClick={closeModal}>
               ×

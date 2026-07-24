@@ -8,7 +8,11 @@ function TermsSection({
   setNotes,
   handleSave,
   handleCancel,
+  formData = {},
+  setFormData,
   isView = false,
+  saveButtonText = "Save",
+  cancelButtonText = "Cancel",
 }) {
   const [files, setFiles] = useState([]);
 
@@ -31,13 +35,13 @@ function TermsSection({
     }
 
     setFiles([...files, ...validFiles]);
-
     e.target.value = "";
   };
 
   const removeFile = (index) => {
     setFiles(files.filter((_, i) => i !== index));
   };
+
   const [terms, setTerms] = useState([
     "In case of any damage during transit or travel, Milestone Enterprises will not be held responsible.",
     "Supply will be made within 2 to 3 Weeks from the date of confirmed PO and full payment.",
@@ -169,6 +173,7 @@ function TermsSection({
             className="form-control mt-3"
             rows="4"
             placeholder="Add extra notes (optional)"
+            disabled={isView}
           />
 
           <div className="mt-4 d-flex align-items-center gap-3">
@@ -178,6 +183,15 @@ function TermsSection({
                 type="checkbox"
                 id="save"
                 disabled={isView}
+                // Checkbox formData se connect ho gaya
+                checked={formData?.isSaveAsTemplate || false}
+                onChange={(e) =>
+                  setFormData &&
+                  setFormData({
+                    ...formData,
+                    isSaveAsTemplate: e.target.checked,
+                  })
+                }
               />
               <label className="form-check-label" htmlFor="save">
                 Save as template
@@ -186,10 +200,10 @@ function TermsSection({
 
             <button
               className="btn btn-warning text-white rounded-3 px-4 py-2"
-              onClick={handleSave}
+              onClick={(e) => handleSave(e, files)}
               disabled={isView}
             >
-              Save
+              {saveButtonText}
             </button>
 
             <button
@@ -197,7 +211,7 @@ function TermsSection({
               onClick={handleCancel}
               disabled={isView}
             >
-              Cancel
+              {cancelButtonText}
             </button>
           </div>
         </div>

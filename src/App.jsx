@@ -4,13 +4,30 @@ import EditQuotation from "./pages/EditQuotation";
 import View from "./pages/view";
 
 import Header from "./components/Header";
-// import ProductTable from "./components/ProductTable";
 import QuotationForm from "./components/QuotationForm";
 import ProductSection from "./components/ProductSection";
 import TermsSection from "./components/Term";
 import "@fontsource/poppins";
 import "./App.css";
-import api from "./api/api"; // <-- Ye API file import ho gayi
+import api from "./api/api";
+
+//mansi
+import AddProductItems from "./modal/AddProductItems";
+import ApproveQuotation from "./modal/ApproveQuotation";
+import CustomerService from "./modal/CustomerService";
+import AddTankyProduct from "./modal/AddTankyProduct";
+import AddService from "./modal/AddService";
+
+//chaitali
+import Quotation from "./pages/Quotation";
+import AddQuot from "./pages/AddQuot";
+import QuotationTemplate from "./pages/QuotationTemplate";
+
+//client finance
+import ClientFinanceMain from "./pages/ClientFinanceMain";
+import ClientFinance from "./pages/ClientFinance";
+import EditClientFinance from "./pages/EditClientFinance";
+import ViewClientFinance from "./pages/ViewClientFinance";
 
 function App() {
   const [validateQuotation, setValidateQuotation] = useState(null);
@@ -46,7 +63,7 @@ function App() {
   const [notes, setNotes] = useState("");
   const [validateProducts, setValidateProducts] = useState(null);
 
-  // handleSave ab async ho gaya hai API call ke liye
+  
   const handleSave = async () => {
     if (validateQuotation && !validateQuotation()) {
       alert("Please fill required details");
@@ -56,28 +73,29 @@ function App() {
       return;
     }
 
- const payloadForBackend = {
+    const payloadForBackend = {
       quotationType: formData.quotationType,
-      clientName: formData.clientName, 
+      quotationNumber: formData.quotationNumber,
+      clientName: formData.clientName,
       subject: formData.subject,
-      products: products, 
+      products: products,
       discount: summary.discount,
       cgst: summary.cgst,
       sgst: summary.sgst,
       other: summary.other,
-      notes: notes
+      notes: notes,
+      grandTotal:
+        summary.grandTotal ||
+        products.reduce((acc, p) => acc + (p.amount || 0), 0),
     };
 
     console.log("Sending data to backend:", payloadForBackend);
 
     try {
-      // Backend ko data bhej  ta haaii ye
       const response = await api.post("/quotations", payloadForBackend);
-
       console.log("Backend response:", response.data);
-      alert("Quotation Saved Successfully in Database!");
 
-      // Save hone ke baad form khali karta hai ye
+      
       setFormData({
         quotationType: "GST",
         quotationNumber: "",
@@ -110,15 +128,18 @@ function App() {
       });
 
       setNotes("");
+
+      
+      return response;
     } catch (error) {
-      console.error("Backend error:", error);
-      alert("Error saving quotation. Check console.");
+      console.error("Backend error:", error.response?.data || error.message);
+      alert("Error saving quotation in database.");
+      throw error;
     }
   };
 
   const handleCancel = () => {
     const confirmCancel = window.confirm("Are you sure you want to cancel?");
-
     if (!confirmCancel) return;
 
     setFormData({
@@ -157,10 +178,11 @@ function App() {
 
   return (
     <Routes>
+      <Route path="/" element={<Quotation />} />
       <Route
-        path="/"
+        path="/addquotation"
         element={
-          <EditQuotation
+          <AddQuot
             formData={formData}
             setFormData={setFormData}
             products={products}
@@ -169,26 +191,41 @@ function App() {
             setSummary={setSummary}
             notes={notes}
             setNotes={setNotes}
-            handleSave={handleSave}
+            handleCreate={handleSave} 
             handleCancel={handleCancel}
             setValidateQuotation={setValidateQuotation}
             setValidateProducts={setValidateProducts}
           />
         }
       />
+      <Route path="/quotation-template" element={<QuotationTemplate />} />
 
+      
+      <Route path="/editquotation/:id" element={<EditQuotation />} />
+
+    
+      <Route path="/view/:id" element={<View />} />
+
+      
+      <Route path="/addproduct" element={<AddProductItems />} />
+      <Route path="/approve-quotation" element={<ApproveQuotation />} />
+      <Route path="/customer-service" element={<CustomerService />} />
+      <Route path="/add-tanky-product" element={<AddTankyProduct />} />
+      <Route path="/add-service" element={<AddService />} />
+
+     
       <Route
-        path="/view"
-        element={
-          <View
-            formData={formData}
-            products={products}
-            summary={summary}
-            notes={notes}
-            setNotes={setNotes}
-          />
-        }
+        path="/client-financeMain/create"
+        element={<ClientFinanceMain />}
       />
+
+      <Route path="/client-finance" element={<ClientFinance />} />
+
+      <Route path="/edit-client-finance" element={<EditClientFinance />} />
+
+      <Route path="/view-client-finance" element={<ViewClientFinance />} />
+
+      <Route path="/client-finance-main" element={<ClientFinanceMain />} />
     </Routes>
   );
 }

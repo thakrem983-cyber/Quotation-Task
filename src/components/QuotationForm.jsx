@@ -7,6 +7,7 @@ function QuotationForm({
   setFormData,
   setValidateQuotation,
   isView = false,
+  heading
 }) {
   const validateForm = () => {
     let newErrors = {};
@@ -41,6 +42,14 @@ function QuotationForm({
 
     const { name, value } = e.target;
 
+    if (name === "quotationName" || name === "clientName") {
+      const regex = /^[A-Za-z\s]*$/;
+
+      if (!regex.test(value)) {
+        return; 
+      }
+    }
+
     setFormData({
       ...formData,
       [name]: value,
@@ -49,8 +58,7 @@ function QuotationForm({
 
   return (
     <div className="mt-4">
-      <h3 className="mb-4">Edit Quotation</h3>
-
+      <h3 className="mb-4">{heading}</h3>
       <div className="row">
         <div className="col-md-4 mb-3">
           <label className="form-label">Quotation Number</label>

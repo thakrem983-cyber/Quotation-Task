@@ -2,13 +2,13 @@ import ProductTable from "./ProductTable";
 import { FaPlusCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import "./Section.css";
-import EditProductModal from "./EditProductModal";
+import EditProductModal from "../modal/EditProductModal";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import AddProductItems from "./AddProductItems";
-import CustomerService from "./CustomerService";
-import AddTankyProduct from "./AddTankyProduct";
-import AddService from "./AddService";
+import AddProductItems from "../modal/AddProductItems";
+import CustomerService from "../modal/CustomerService";
+import AddTankyProduct from "../modal/AddTankyProduct";
+import AddService from "../modal/AddService";
 
 function ProductSection({
   products,
@@ -135,11 +135,6 @@ function ProductSection({
         alert("Please complete product details");
         return false;
       }
-
-      // if (product.isEditing) {
-      //   alert("Please save product details first");
-      //   return false;
-      // }
     }
 
     return true;
@@ -152,23 +147,29 @@ function ProductSection({
   }, [products, setValidateProducts]);
 
   const productsTotal = products.reduce((total, product) => {
-    return total + product.amount;
-  }, 0);
-  const discountAmount = (productsTotal * summary.discount) / 100;
+    const itemTotal =
+      Number(product.amount) ||
+      Number(product.total) ||
+      Number(product.price || 0) * Number(product.quantity || 0);
 
+    return total + itemTotal;
+  }, 0);
+
+  const safeDiscount = Number(summary.discount) || 0;
+  const safeCgst = Number(summary.cgst) || 0;
+  const safeSgst = Number(summary.sgst) || 0;
+  const safeOther = Number(summary.other) || 0;
+
+  const discountAmount = (productsTotal * safeDiscount) / 100;
   const taxableAmount = productsTotal - discountAmount;
 
   const cgstAmount =
-    formData.quotationType === "Cash"
-      ? 0
-      : (taxableAmount * summary.cgst) / 100;
+    formData?.quotationType === "Cash" ? 0 : (taxableAmount * safeCgst) / 100;
 
   const sgstAmount =
-    formData.quotationType === "Cash"
-      ? 0
-      : (taxableAmount * summary.sgst) / 100;
+    formData?.quotationType === "Cash" ? 0 : (taxableAmount * safeSgst) / 100;
 
-  const otherAmount = (taxableAmount * summary.other) / 100;
+  const otherAmount = (taxableAmount * safeOther) / 100;
 
   const finalAmount = taxableAmount + cgstAmount + sgstAmount + otherAmount;
 
@@ -376,28 +377,36 @@ function ProductSection({
         </div>
       </div>
       {showAddProductModal && (
-        <AddProductItems closeModal={() => setShowAddProductModal(false)} />
+        <AddProductItems
+          closeModal={() => setShowAddProductModal(false)}
+          products={products}
+          setProducts={setProducts}
+        />
       )}
 
       {showCustomerServiceModal && (
         <CustomerService
           closeModal={() => setShowCustomerServiceModal(false)}
+          products={products}
+          setProducts={setProducts}
         />
-      )}
-
-      {showAddServiceModal && (
-        <AddService closeModal={() => setShowAddServiceModal(false)} />
       )}
 
       {showAddTankyProductModal && (
         <AddTankyProduct
           closeModal={() => setShowAddTankyProductModal(false)}
           openAddService={() => setShowAddServiceModal(true)}
+          products={products}
+          setProducts={setProducts}
         />
       )}
 
       {showAddServiceModal && (
-        <AddService closeModal={() => setShowAddServiceModal(false)} />
+        <AddService
+          closeModal={() => setShowAddServiceModal(false)}
+          products={products}
+          setProducts={setProducts}
+        />
       )}
     </>
   );
