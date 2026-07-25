@@ -1,26 +1,28 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import "./ApproveQuotation.css";
 import api from "../api/api";
 
 function ApproveQuotation({
   closeModal,
   onApprove,
-  quotationId,
-  quotationNumber,
+  quotation,
+  // quotationId,
+  // quotationNumber,
 }) {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  //added
+  const quotationId = quotation?.id;
+  const quotationNumber = quotation?.quotation;
 
   const [paymentReceived, setPaymentReceived] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isSaved, setIsSaved] = useState(false); 
+  const [isSaved, setIsSaved] = useState(false);
 
-  
   const [amount, setAmount] = useState("");
   const [paymentMode, setPaymentMode] = useState("");
   const [paidTo, setPaidTo] = useState("");
 
-  
   const [expectedDate, setExpectedDate] = useState("");
   const [note, setNote] = useState("");
   const [selectedButton, setSelectedButton] = useState("");
@@ -29,14 +31,12 @@ function ApproveQuotation({
     try {
       setLoading(true);
 
-      
       if (paymentReceived === false && !expectedDate) {
         alert("Bhai, Expected Advance Date select karna zaroori hai!");
         setLoading(false);
         return;
       }
 
-      
       if (paymentReceived === true) {
         if (!amount || !paymentMode || !paidTo) {
           alert("Please fill all payment details.");
@@ -46,16 +46,15 @@ function ApproveQuotation({
       }
 
       const today = new Date().toISOString().split("T")[0];
-      
+
       const approvePayload = {
         expectedAdvanceDate: paymentReceived === false ? expectedDate : today,
         expectedDate: paymentReceived === false ? expectedDate : today,
         note: paymentReceived === false ? note : "Payment Received",
       };
-      
+
       await api.put(`/quotations/${quotationId}/approve`, approvePayload);
 
-      
       if (paymentReceived === true) {
         const paymentPayload = {
           quotationId: quotationId,
@@ -68,35 +67,46 @@ function ApproveQuotation({
       }
 
       alert("Quotation Approved Successfully!");
-      setIsSaved(true); 
-      onApprove(); 
-      
-     
-
+      setIsSaved(true);
+      onApprove();
     } catch (error) {
-      console.error("Backend se ye error aayi:", error.response?.data || error.message);
-      const backendMsg = error.response?.data?.message || "Failed to approve quotation";
+      console.error(
+        "Backend se ye error aayi:",
+        error.response?.data || error.message,
+      );
+      const backendMsg =
+        error.response?.data?.message || "Failed to approve quotation";
       alert(`Error: ${backendMsg}`);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleCancel = () => {
     closeModal();
   };
 
+  // const handleFinance = () => {
+
+  //   navigate('/client-finance', {
+  //     state: {
+  //       quotation: {
+  //         id: quotationId,
+  //         quotationNumber: quotationNumber,
+
+  //         advanceAmount: paymentReceived ? amount : 0
+  //       }
+  //     }
+  //   });
+  // };
+
   const handleFinance = () => {
-   
-    navigate('/client-finance', { 
-      state: { 
-        quotation: {
-          id: quotationId,
-          quotationNumber: quotationNumber,
-          
-          advanceAmount: paymentReceived ? amount : 0 
-        }
-      } 
+    navigate("/client-finance", {
+      state: {
+        quotationData: quotation.quotationData,
+
+        advanceAmount: paymentReceived ? amount : 0,
+      },
     });
   };
 
@@ -128,7 +138,7 @@ function ApproveQuotation({
                   : "approve-normal-btn"
               }
               onClick={() => setPaymentReceived(true)}
-              disabled={isSaved} 
+              disabled={isSaved}
             >
               YES
             </button>
@@ -140,7 +150,7 @@ function ApproveQuotation({
                   : "approve-normal-btn"
               }
               onClick={() => setPaymentReceived(false)}
-              disabled={isSaved} 
+              disabled={isSaved}
             >
               NO
             </button>
@@ -167,7 +177,7 @@ function ApproveQuotation({
                         setAmount(value);
                       }
                     }}
-                    disabled={isSaved}  
+                    disabled={isSaved}
                   />
 
                   <div className="approve-row">
@@ -223,9 +233,13 @@ function ApproveQuotation({
                         setSelectedButton("approve");
                         handleApprove();
                       }}
-                      disabled={loading || isSaved} 
+                      disabled={loading || isSaved}
                     >
-                      {loading ? "Saving..." : isSaved ? "Saved!" : "Approve & Save"}
+                      {loading
+                        ? "Saving..."
+                        : isSaved
+                          ? "Saved!"
+                          : "Approve & Save"}
                     </button>
 
                     <button
@@ -243,7 +257,6 @@ function ApproveQuotation({
                     </button>
                   </div>
 
-                  
                   <button
                     className={`approve-finance-btn ${
                       selectedButton === "finance" ? "approve-selected-btn" : ""
@@ -252,10 +265,10 @@ function ApproveQuotation({
                       setSelectedButton("finance");
                       handleFinance();
                     }}
-                    disabled={!isSaved} 
+                    disabled={!isSaved}
                     style={{
                       opacity: isSaved ? 1 : 0.5,
-                      cursor: isSaved ? "pointer" : "not-allowed"
+                      cursor: isSaved ? "pointer" : "not-allowed",
                     }}
                   >
                     Create Finance
@@ -297,7 +310,11 @@ function ApproveQuotation({
                       }}
                       disabled={loading || isSaved}
                     >
-                      {loading ? "Saving..." : isSaved ? "Saved!" : "Approve & Save"}
+                      {loading
+                        ? "Saving..."
+                        : isSaved
+                          ? "Saved!"
+                          : "Approve & Save"}
                     </button>
 
                     <button
@@ -323,10 +340,10 @@ function ApproveQuotation({
                       setSelectedButton("finance");
                       handleFinance();
                     }}
-                    disabled={!isSaved} 
+                    disabled={!isSaved}
                     style={{
                       opacity: isSaved ? 1 : 0.5,
-                      cursor: isSaved ? "pointer" : "not-allowed"
+                      cursor: isSaved ? "pointer" : "not-allowed",
                     }}
                   >
                     Create Finance

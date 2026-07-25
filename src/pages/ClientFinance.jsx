@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 import { Country, State, City } from "country-state-city";
 import api from "../api/api";
@@ -15,6 +14,8 @@ import AddService from "../modal/AddService";
 
 function ClientFinance() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const quotationData = location.state?.quotationData;
 
   // API & Loading States
   const [quotations, setQuotations] = useState([]);
@@ -62,7 +63,7 @@ function ClientFinance() {
   const [sgstPct, setSgstPct] = useState("9");
   const [otherPct, setOtherPct] = useState("");
 
-  // 🔄 Fetch Approved Quotations on Quotation Type Change
+  // 1. Fetch Approved Quotations List when quotationType changes
   useEffect(() => {
     fetchApprovedQuotations();
   }, [quotationType]);
@@ -73,7 +74,7 @@ function ClientFinance() {
       const res = await api.get(
         `/client-finance/approved-quotations?type=${quotationType}`
       );
-      setQuotations(res.data || []);
+      setQuotations(res.data?.data || res.data || []);
     } catch (err) {
       console.error("Error fetching approved quotations:", err);
     } finally {
@@ -81,11 +82,8 @@ function ClientFinance() {
     }
   };
 
-  // 🔄 Auto-fill Form when Quotation is Selected
-  const handleQuotationSelect = async (e) => {
-    const quotationId = e.target.value;
-    setQuotationNo(quotationId);
-
+  // 2. Fetch specific quotation details by ID and populate form fields
+  const fetchQuotationDetails = async (quotationId) => {
     if (!quotationId) return;
 
     try {
@@ -120,6 +118,25 @@ function ClientFinance() {
       console.error("Error fetching quotation details:", err);
     }
   };
+
+  // Dropdown Selection Handler
+  const handleQuotationSelect = (eOrId) => {
+    const quotationId = typeof eOrId === "string" ? eOrId : eOrId.target.value;
+    setQuotationNo(quotationId);
+    fetchQuotationDetails(quotationId);
+  };
+
+  // 3. Auto-select Quotation passed via `location.state`
+  useEffect(() => {
+    if (quotationData?._id) {
+      // Set type if present in state
+      if (quotationData.type) {
+        setQuotationType(quotationData.type);
+      }
+      setQuotationNo(quotationData._id);
+      fetchQuotationDetails(quotationData._id);
+    }
+  }, [quotationData]);
 
   useEffect(() => {
     if (products.length === 0) {
@@ -200,7 +217,7 @@ function ClientFinance() {
   const orangeBtnStyle = { backgroundColor: "#f58c22", color: "white", border: "none" };
   const orangeOutlineBtnStyle = { backgroundColor: "transparent", color: "#f58c22", border: "1px solid #f58c22" };
 
-  // 🚀 Fixed handleCreate Function with Try/Catch & Error handling
+  // Submit Handler
   const handleCreate = async () => {
     if (!clientName.trim()) {
       alert("Client Name is required.");

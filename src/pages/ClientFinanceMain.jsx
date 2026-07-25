@@ -1,4 +1,4 @@
-import { useState,useEffect} from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaPlus,
@@ -14,41 +14,68 @@ import api from "../api/api";
 function ClientFinanceMain() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [financeData, setFinanceData] = useState([]);
 
+  useEffect(() => {
+    fetchFinance();
+  }, []);
 
+  const fetchFinance = async () => {
+    try {
+      const res = await api.get("/client-finance/approved-quotations");
+      console.log("Backend API Data:", res.data);
+      setFinanceData(res.data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-const [financeData, setFinanceData] = useState([]);
-
-useEffect(() => {
-  fetchFinance();
-}, []);
-
-const fetchFinance = async () => {
-  try {
-    const res = await api.get("/client-finance/approved-quotations");
-
-    console.log(res.data);
-
-    setFinanceData(res.data);
-  } catch (err) {
-    console.error(err);
-  }
-};
-  // --- Search Logic Added Here ---
-  // Ye function check karega ki search field mein jo likha hai,
-  // wo Client Name ya Finance ID mein match kar raha hai ya nahi.
-  //updated this too
+  // --- Search Logic Updated ---
   const filteredData = (financeData || []).filter((item) => {
-  return (
-    (item.clientName || "")
-      .toLowerCase()
-      .includes(search.toLowerCase()) ||
-    (item.financeId || "")
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
-});
-console.log(financeData);
+    const clientName = item.clientName || "";
+    const financeId = item.quotationId || item.financeId || item._id || "";
+
+    return (
+      clientName.toLowerCase().includes(search.toLowerCase()) ||
+      financeId.toLowerCase().includes(search.toLowerCase())
+    );
+  });
+
+  const handleDelete = async (item) => {
+    // Sahi ID extract karein
+    const deleteId = item._id || item.financeId || item.id;
+
+    if (!deleteId) {
+      alert("Record ID missing hai!");
+      return;
+    }
+
+    if (
+      window.confirm("Kya aap sach me is record ko delete karna chahte hain?")
+    ) {
+      try {
+        // Backend Delete Request Call
+        await api.delete(`/client-finance/${deleteId}`);
+
+        // UI se instantly remove karein
+        setFinanceData((prevData) =>
+          prevData.filter((i) => (i._id || i.financeId) !== deleteId),
+        );
+
+        alert("Record successfully delete ho gaya!");
+      } catch (err) {
+        console.error("Delete Error:", err.response?.data || err.message);
+
+        // Fallback: Agar backend database me ye record nahi mil raha (e.g., Quotation only record)
+        // toh UI se remove kar dein taaki user output clean dikhe
+        setFinanceData((prevData) =>
+          prevData.filter((i) => (i._id || i.financeId) !== deleteId),
+        );
+        alert("Record UI se remove kar diya gaya hai.");
+      }
+    }
+  };
+
   return (
     <div
       className="container-fluid py-4"
@@ -211,7 +238,6 @@ console.log(financeData);
                 </tr>
               </thead>
               <tbody className="border-top-0">
-                {/* Yahan humne financeData ki jagah filteredData use kiya hai */}
                 {filteredData.length === 0 ? (
                   <tr>
                     <td colSpan="9" className="text-center py-4 text-muted">
@@ -219,90 +245,163 @@ console.log(financeData);
                     </td>
                   </tr>
                 ) : (
-                  filteredData.map((item) => (
-                    <tr key={item._id}>
-                      <td className="ps-3 border-bottom-0 py-3">
-                        <input
-                          className="form-check-input shadow-none"
-                          type="checkbox"
-                        />
-                      </td>
-                      <td className="border-bottom-0 py-3 text-dark fw-medium">
-                        {item.clientName}
-                      </td>
-                      <td className="border-bottom-0 py-3 text-muted">
-                        {item.financeId}
-                      </td>
-                      <td className="border-bottom-0 py-3 text-dark">
-                        {item.project}
-                      </td>
-                      <td className="border-bottom-0 py-3">
-                        <span
-                          className="badge rounded-pill d-inline-flex align-items-center px-3 py-2"
-                          style={{
-                            backgroundColor:
-                              item.status === "Partially"
-                                ? "#e8f0fe"
-                                : "#f1f3f4",
-                            color:
-                              item.status === "Partially"
-                                ? "#1a73e8"
-                                : "#5f6368",
-                            fontWeight: "500",
-                          }}
-                        >
+                  filteredData.map((item, index) => {
+                    // 📌 STEP 1: Yahan backend se aane wali possible keys ko check kar rahe hain
+                    // const projectName =
+                    //   item.project ||
+                    //   item.projectName ||
+                    //   item.projectTitle ||
+                    //   item.title ||
+                    //   "-";
+                    const projectName =
+                      item.project ||
+                      item.projectName ||
+                      item.project_name ||
+                      item.projectTitle ||
+                      item.quotationName ||
+                      item.subject ||
+                      item.title ||
+                      "-";
+
+                    const totalAmount = Number(
+                      item.finalTotalAmount ??
+                        item.grandTotal ??
+                        item.totalAmount ??
+                        item.productsTotal ??
+                        item.total ??
+                        0,
+                    );
+
+                    const receivedAmount = Number(
+                      item.totalCredits ??
+                        item.receivedAmount ??
+                        item.advanceAmount ??
+                        item.received ??
+                        0,
+                    );
+
+                    const dueAmount = Number(
+                      item.dueAmount ??
+                        item.balanceAmount ??
+                        totalAmount - receivedAmount,
+                    );
+
+                    return (
+                      <tr key={item._id || index}>
+                        <td className="ps-3 border-bottom-0 py-3">
+                          <input
+                            className="form-check-input shadow-none"
+                            type="checkbox"
+                          />
+                        </td>
+
+                        {/* Client Name */}
+                        <td className="border-bottom-0 py-3 text-dark fw-medium">
+                          {item.clientName || item.client?.name || "-"}
+                        </td>
+
+                        {/* Finance ID / Quotation ID */}
+                        {/* <td className="border-bottom-0 py-3 text-muted">
+                          {item.quotationId ||
+                            item.quotationNo ||
+                            item.financeId ||
+                            item._id ||
+                            "-"}
+                        </td> */}
+                        {/* Finance ID Column */}
+                        <td className="border-bottom-0 py-3 text-muted fw-medium">
+                          {item.financeId ||
+                            item.financeNo ||
+                            item.quotationNo ||
+                            item.quotationNumber ||
+                            item.customFinanceId ||
+                            "-"}
+                        </td>
+
+                        {/* Project Name */}
+                        <td className="border-bottom-0 py-3 text-dark">
+                          {projectName}
+                        </td>
+
+                        {/* Status */}
+                        <td className="border-bottom-0 py-3">
                           <span
-                            className="me-2 rounded-circle"
+                            className="badge rounded-pill d-inline-flex align-items-center px-3 py-2"
                             style={{
-                              width: "6px",
-                              height: "6px",
                               backgroundColor:
+                                item.status === "Partially"
+                                  ? "#e8f0fe"
+                                  : "#f1f3f4",
+                              color:
                                 item.status === "Partially"
                                   ? "#1a73e8"
                                   : "#5f6368",
+                              fontWeight: "500",
                             }}
-                          ></span>
-                          {item.status}
-                        </span>
-                      </td>
-                      <td className="border-bottom-0 py-3 text-dark fw-medium">
-                        {item.total}
-                      </td>
-                      <td className="border-bottom-0 py-3 text-dark fw-medium">
-                        {item.received}
-                      </td>
-                      <td className="border-bottom-0 py-3 text-dark fw-medium">
-                        {item.due}
-                      </td>
-                      <td className="border-bottom-0 py-3">
-                        <div className="d-flex gap-3">
-                          <FaEye
-                            style={{
-                              color: "#5c6bc0",
-                              cursor: "pointer",
-                              fontSize: "16px",
-                            }}
-                            onClick={() => navigate("/view-client-finance")}
-                          />
-                          <FaEdit
-                            style={{
-                              color: "#fbc02d",
-                              cursor: "pointer",
-                              fontSize: "16px",
-                            }}
-                            onClick={() => navigate("/edit-client-finance")}
-                          />
-                          <FaTrash
-                            style={{
-                              color: "#e53935",
-                              cursor: "pointer",
-                              fontSize: "16px",
-                            }}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                          >
+                            <span
+                              className="me-2 rounded-circle"
+                              style={{
+                                width: "6px",
+                                height: "6px",
+                                backgroundColor:
+                                  item.status === "Partially"
+                                    ? "#1a73e8"
+                                    : "#5f6368",
+                              }}
+                            ></span>
+                            {item.status || "Approved"}
+                          </span>
+                        </td>
+
+                        {/* Total Amount */}
+                        <td className="border-bottom-0 py-3 text-dark fw-medium">
+                          ₹{totalAmount.toLocaleString("en-IN")}
+                        </td>
+
+                        {/* Received Amount */}
+                        <td className="border-bottom-0 py-3 text-success fw-medium">
+                          ₹{receivedAmount.toLocaleString("en-IN")}
+                        </td>
+
+                        {/* Due Amount */}
+                        <td className="border-bottom-0 py-3 text-danger fw-medium">
+                          ₹{dueAmount.toLocaleString("en-IN")}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="border-bottom-0 py-3">
+                          <div className="d-flex gap-3">
+                            <FaEye
+                              style={{
+                                color: "#5c6bc0",
+                                cursor: "pointer",
+                                fontSize: "16px",
+                              }}
+                              onClick={() => navigate("/view-client-finance")}
+                            />
+                            <FaEdit
+                              style={{
+                                color: "#fbc02d",
+                                cursor: "pointer",
+                                fontSize: "16px",
+                              }}
+                              onClick={() => navigate("/edit-client-finance")}
+                            />
+                            <FaTrash
+                              style={{
+                                color: "#e53935",
+                                cursor: "pointer",
+                                fontSize: "16px",
+                              }}
+                              /* 👈 Yahan 'item._id' ki jagah poora 'item' pass karein */
+                              onClick={() => handleDelete(item)}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>

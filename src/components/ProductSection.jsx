@@ -54,18 +54,8 @@ function ProductSection({
       },
     ]);
   };
-const deleteProduct = (deleteId) => {
-   
-    if (!deleteId) {
-      console.log("id is not found");
-      return; 
-    }
-
-    
-    const updatedProducts = products.filter(
-      (product) => product.id !== deleteId && product._id !== deleteId
-    );
-    
+  const deleteProduct = (id) => {
+    const updatedProducts = products.filter((product) => product.id !== id);
     setProducts(updatedProducts);
   };
   const editProduct = (id) => {
@@ -281,17 +271,31 @@ const deleteProduct = (deleteId) => {
                   <span className="text-secondary">Discount</span>
 
                   <div className="input-group" style={{ width: "90px" }}>
-                    <input
+                    {/* <input
                       type="number"
+                      className="form-control text-center" */}
+                    <input
+                      type="text"
+                      inputMode="numeric"
                       className="form-control text-center"
                       value={summary.discount}
                       disabled={isView}
-                      onChange={(e) =>
-                        setSummary({
-                          ...summary,
-                          discount: Number(e.target.value),
-                        })
-                      }
+                      // onChange={(e) =>
+                      //   setSummary({
+                      //     ...summary,
+                      //     discount: Number(e.target.value),
+                      //   })
+                      // }
+                      onChange={(e) => {
+                        const value = e.target.value;
+
+                        if (/^\d*$/.test(value)) {
+                          setSummary({
+                            ...summary,
+                            discount: value === "" ? "" : Number(value),
+                          });
+                        }
+                      }}
                     />
                     <span className="input-group-text">%</span>
                   </div>
@@ -305,19 +309,33 @@ const deleteProduct = (deleteId) => {
                   <span className="text-secondary">CGST</span>
 
                   <div className="input-group" style={{ width: "90px" }}>
-                    <input
+                    {/* <input
                       type="number"
+                      className="form-control text-center" */}
+                    <input
+                      type="text"
+                      inputMode="numeric"
                       className="form-control text-center"
                       value={
                         formData.quotationType === "Cash" ? 0 : summary.cgst
                       }
                       disabled={isView || formData.quotationType === "Cash"}
-                      onChange={(e) =>
-                        setSummary({
-                          ...summary,
-                          cgst: Number(e.target.value),
-                        })
-                      }
+                      // onChange={(e) =>
+                      //   setSummary({
+                      //     ...summary,
+                      //     cgst: Number(e.target.value),
+                      //   })
+                      // }
+                      onChange={(e) => {
+                        const value = e.target.value;
+
+                        if (/^\d*$/.test(value)) {
+                          setSummary({
+                            ...summary,
+                            cgst: value === "" ? "" : Number(value),
+                          });
+                        }
+                      }}
                     />
                     <span className="input-group-text">%</span>
                   </div>
@@ -331,19 +349,33 @@ const deleteProduct = (deleteId) => {
                   <span className="text-secondary">SGST</span>
 
                   <div className="input-group" style={{ width: "90px" }}>
-                    <input
+                    {/* <input
                       type="number"
+                      className="form-control text-center" */}
+                    <input
+                      type="text"
+                      inputMode="numeric"
                       className="form-control text-center"
                       value={
                         formData.quotationType === "Cash" ? 0 : summary.sgst
                       }
                       disabled={isView || formData.quotationType === "Cash"}
-                      onChange={(e) =>
-                        setSummary({
-                          ...summary,
-                          sgst: Number(e.target.value),
-                        })
-                      }
+                      // onChange={(e) =>
+                      //   setSummary({
+                      //     ...summary,
+                      //     sgst: Number(e.target.value),
+                      //   })
+                      // }
+                      onChange={(e) => {
+                        const value = e.target.value;
+
+                        if (/^\d*$/.test(value)) {
+                          setSummary({
+                            ...summary,
+                            sgst: value === "" ? "" : Number(value),
+                          });
+                        }
+                      }}
                     />
                     <span className="input-group-text">%</span>
                   </div>
@@ -357,17 +389,31 @@ const deleteProduct = (deleteId) => {
                   <span className="text-secondary">Other</span>
 
                   <div className="input-group" style={{ width: "90px" }}>
-                    <input
+                    {/* <input
                       type="number"
+                      className="form-control text-center" */}
+                    <input
+                      type="text"
+                      inputMode="numeric"
                       className="form-control text-center"
                       disabled={isView}
                       value={summary.other}
-                      onChange={(e) =>
-                        setSummary({
-                          ...summary,
-                          other: Number(e.target.value),
-                        })
-                      }
+                      // onChange={(e) =>
+                      //   setSummary({
+                      //     ...summary,
+                      //     other: Number(e.target.value),
+                      //   })
+                      // }
+                      onChange={(e) => {
+                        const value = e.target.value;
+
+                        if (/^\d*$/.test(value)) {
+                         setSummary({
+                            ...summary,
+                            other: value === "" ? "" : Number(value),
+                          });
+                        }
+                      }}
                     />
                     <span className="input-group-text">%</span>
                   </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -6,7 +6,7 @@ import "./index.css";
 import EditQuotation from "./EditQuotation";
 import DeleteQuotation from "../modal/DeleteQuotation";
 import ApproveQuotation from "../modal/ApproveQuotation";
-import api from "../api/api"; 
+import api from "../api/api";
 
 import {
   FaEye,
@@ -33,42 +33,49 @@ function Quotation() {
   const [selectedUsers, setSelectedUsers] = useState([]);
 
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
-  
   useEffect(() => {
     fetchQuotations();
   }, []);
 
   const fetchQuotations = async () => {
     try {
-     
       const response = await api.get("/quotations");
-      
-    
+
       const backendData = response.data.data;
 
-      
+      // const formattedData = backendData.map((item) => ({
+      //   id: item._id,
+      //   name: item.clientName,
+      //   quotation: item.quotationNumber,
+      //   date: new Date(item.createdAt).toLocaleDateString(),
+      //   advance: item.amountReceived ? `₹${item.amountReceived}` : "₹0.00",
+      //   total: `₹${item.grandTotal.toFixed(2)}`,
+      //   status: item.status,
+      //   type: item.quotationType
+      // }));
+
       const formattedData = backendData.map((item) => ({
-        id: item._id, 
-        name: item.clientName, 
+        id: item._id,
+        name: item.clientName,
         quotation: item.quotationNumber,
         date: new Date(item.createdAt).toLocaleDateString(),
         advance: item.amountReceived ? `₹${item.amountReceived}` : "₹0.00",
         total: `₹${item.grandTotal.toFixed(2)}`,
         status: item.status,
-        type: item.quotationType 
+        type: item.quotationType,
+
+        quotationData: item,
       }));
 
-      
       setUsers(formattedData);
       setLoading(false);
     } catch (error) {
       console.error("Data laane mein error aayi:", error);
       setLoading(false);
     }
-  }
-  
+  };
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
@@ -79,8 +86,6 @@ function Quotation() {
 
     return matchesSearch && matchesType;
   });
-
-  
 
   const handleStatusChange = (id, newStatus) => {
     if (newStatus === "Approved") {
@@ -101,28 +106,23 @@ function Quotation() {
     setShowDeleteModal(true);
   };
 
-const confirmDelete = async () => { 
+  const confirmDelete = async () => {
     try {
-      
       await api.delete(`/quotations/${selectedId}`);
 
-      
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== selectedId));
+      setUsers((prevUsers) =>
+        prevUsers.filter((user) => user.id !== selectedId),
+      );
 
-     
       setShowDeleteModal(false);
       setSelectedId(null);
-      
-      
+
       alert("Quotation deleted successfully!");
-      
     } catch (error) {
       console.error(" error :", error);
       alert("Failed to delete quotation. Please try again.");
     }
   };
-
-   
 
   const confirmApprove = () => {
     setUsers((prevUsers) =>
@@ -139,7 +139,10 @@ const confirmDelete = async () => {
       <div className="quotation-card">
         <div className="quotation-header">
           <h1>Quotation</h1>
-          <button className="quot-add-btn" onClick={() => navigate("/quotation-template")}>
+          <button
+            className="quot-add-btn"
+            onClick={() => navigate("/quotation-template")}
+          >
             + Add Quotation
           </button>
         </div>
@@ -242,7 +245,6 @@ const confirmDelete = async () => {
 
                 <td>{user.total}</td>
 
-               
                 <td>
                   {user.status === "Pending" ? (
                     <Dropdown>
@@ -281,9 +283,11 @@ const confirmDelete = async () => {
                   )}
                 </td>
                 <td className="action-icons">
-                 <FaEye onClick={() => navigate(`/view/${user.id}`)} />
+                  <FaEye onClick={() => navigate(`/view/${user.id}`)} />
                   <FaDownload onClick={() => handleDownload(user.id)} />
-                  <FaEdit onClick={() => navigate(`/editquotation/${user.id}`)} />
+                  <FaEdit
+                    onClick={() => navigate(`/editquotation/${user.id}`)}
+                  />
                   <FaShareAlt onClick={() => handleShare(user.id)} />
                   <FaTrash onClick={() => handleDelete(user.id)} />
                   <FaPrint onClick={() => handlePrint(user.id)} />
@@ -292,43 +296,50 @@ const confirmDelete = async () => {
             ))}
           </tbody>
         </table>
-      {showDeleteModal && (
+        {showDeleteModal && (
           <DeleteQuotation
             closeModal={() => {
               setShowDeleteModal(false);
               setSelectedId(null);
             }}
             onDelete={confirmDelete}
-            
-            quotationNo={users.find(u => u.id === selectedId)?.quotation} 
+            quotationNo={users.find((u) => u.id === selectedId)?.quotation}
           />
         )}
 
         {showApproveModal && (
+          // <ApproveQuotation
+          //   closeModal={() => setShowApproveModal(false)}
+          //   quotationId={approveId}
+          //   quotationNumber={users.find(u => u.id === approveId)?.quotation}
+
+          //   onApprove={() => {
+
+          //     setUsers((prevUsers) =>
+          //       prevUsers.map((user) =>
+          //         user.id === approveId ? { ...user, status: "Approved" } : user
+          //       )
+          //     );
+
+          //   }}
+          // />
           <ApproveQuotation
             closeModal={() => setShowApproveModal(false)}
-            quotationId={approveId} 
-            quotationNumber={users.find(u => u.id === approveId)?.quotation}
-            
-            
+            quotation={users.find((u) => u.id === approveId)}
             onApprove={() => {
-              
-              setUsers((prevUsers) => 
-                prevUsers.map((user) => 
-                  user.id === approveId ? { ...user, status: "Approved" } : user
-                )
+              setUsers((prevUsers) =>
+                prevUsers.map((user) =>
+                  user.id === approveId
+                    ? { ...user, status: "Approved" }
+                    : user,
+                ),
               );
-              
-              
             }}
           />
         )}
-        
       </div>
     </div>
   );
 }
 
-
 export default Quotation;
-
