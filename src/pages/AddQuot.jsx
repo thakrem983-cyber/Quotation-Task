@@ -103,7 +103,7 @@ function AddQuot({
       } catch (error) {
         
         console.error("Database Template Error:", error.response?.data || error.message);
-        alert(`Template save nahi hua: ${error.response?.data?.message || "Format mismatch"}`);
+        alert(`Template is not save: ${error.response?.data?.message || "Format mismatch"}`);
       }
     }
     
@@ -142,7 +142,7 @@ function AddQuot({
       navigate("/quotation-template"); 
 
     } catch (err) {
-      console.error("Save karte time error aayi:", err);
+      console.error("error is comming:", err);
       alert("Failed to save Quotation.");
     }
   };

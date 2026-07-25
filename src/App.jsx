@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EditQuotation from "./pages/EditQuotation";
 import View from "./pages/view";
 
@@ -41,19 +41,10 @@ function App() {
     clientName: "",
     subject: "",
   });
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      productName: "",
-      code: "",
-      unit: "",
-      price: 0,
-      quantity: 1,
-      amount: 0,
-      image: null,
-      isEditing: true,
-    },
-  ]);
+  
+  // 🔴 CHANGE 1: Yahan se default dummy row hata di gayi hai. Array ab completely empty hai.
+  const [products, setProducts] = useState([]);
+  
   const [summary, setSummary] = useState({
     discount: 0,
     cgst: 0,
@@ -62,6 +53,30 @@ function App() {
   });
   const [notes, setNotes] = useState("");
   const [validateProducts, setValidateProducts] = useState(null);
+
+  useEffect(() => {
+    const fetchQuotationNumber = async () => {
+      try {
+        // Dropdown se jo bhi type select hoga (GST ya Non-GST), wo yahan aayega
+        const type = formData.quotationType || "GST";
+        
+        const response = await api.get(`/quotations/preview-number?quotationType=${type}`);
+        
+        if (response.data && response.data.currentQuotationNumber) {
+          // Backend se aaya number formData mein set kar do
+          setFormData((prev) => ({
+            ...prev,
+            quotationNumber: response.data.currentQuotationNumber,
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching quotation number:", error);
+      }
+    };
+
+    // Jaise hi page khulega ya quotationType badlega, ye function chalega
+    fetchQuotationNumber();
+  }, [formData.quotationType]);
 
   
   const handleSave = async () => {
@@ -76,6 +91,7 @@ function App() {
     const payloadForBackend = {
       quotationType: formData.quotationType,
       quotationNumber: formData.quotationNumber,
+      quotationName:formData.quotationName,
       clientName: formData.clientName,
       subject: formData.subject,
       products: products,
@@ -106,19 +122,8 @@ function App() {
         subject: "",
       });
 
-      setProducts([
-        {
-          id: 1,
-          productName: "",
-          code: "",
-          unit: "",
-          price: 0,
-          quantity: 1,
-          amount: 0,
-          image: null,
-          isEditing: true,
-        },
-      ]);
+      // 🔴 CHANGE 2: Form save hone ke baad list ko waapas empty set karein
+      setProducts([]);
 
       setSummary({
         discount: 0,
@@ -152,19 +157,8 @@ function App() {
       subject: "",
     });
 
-    setProducts([
-      {
-        id: 1,
-        productName: "",
-        code: "",
-        unit: "",
-        price: 0,
-        quantity: 1,
-        amount: 0,
-        image: null,
-        isEditing: true,
-      },
-    ]);
+    // 🔴 CHANGE 3: Cancel dabane par bhi array empty ho jaye
+    setProducts([]);
 
     setSummary({
       discount: 0,

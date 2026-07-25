@@ -43,12 +43,11 @@ function EditQuotation() {
     }
   }, [id]);
 
-  const fetchQuotationDetails = async () => {
+const fetchQuotationDetails = async () => {
     try {
       const response = await api.get(`/quotations/${id}`);
       const backendData = response.data.data;
 
-   
       setFormData({
         quotationType: backendData.quotationType || "GST",
         quotationNumber: backendData.quotationNumber || "",
@@ -59,21 +58,22 @@ function EditQuotation() {
         subject: backendData.subject || "",
       });
 
-      
       const mappedProducts = (backendData.products || []).map((p, index) => ({
         id: p._id || index + 1,
         productName: p.productName || "",
-        code: p.code || "", 
+        code: p.code || p.productCode || "", // 🔴 Code proper set kiya
         unit: p.unit || "Nos",
         price: p.price || 0,
         quantity: p.quantity || 1,
         amount: p.total || p.amount || 0,
-        isEditing: true,
-        image: p.image || null,
+        
+        // 🔴 CHANGE 1: Isko false kar diya, ab default box nahi aayega!
+        isEditing: false, 
+        
+        image: p.image && p.image !== "null" ? p.image : null,
       }));
       setProducts(mappedProducts);
 
-      
       setSummary({
         discount: backendData.discount || 0,
         cgst: backendData.cgst || 0,
@@ -81,7 +81,6 @@ function EditQuotation() {
         other: backendData.other || 0,
       });
 
-     
       setNotes(backendData.notes || "");
       setLoading(false);
     } catch (error) {
@@ -91,7 +90,6 @@ function EditQuotation() {
     }
   };
 
- 
   const handleUpdate = async () => {
     if (validateQuotation && !validateQuotation()) {
       alert("Please fill required form fields!");
@@ -104,6 +102,10 @@ function EditQuotation() {
     const updatePayload = {
       quotationType: formData.quotationType,
       quotationNumber: formData.quotationNumber,
+      
+      // 🔴 CHANGE 2: Update karte waqt naam gayab na ho isliye ise add kiya!
+      quotationName: formData.quotationName, 
+      
       clientName: formData.clientName,
       subject: formData.subject,
       products: products,

@@ -185,13 +185,15 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
                       />
                     </td>
 
+                  
                     <td>
                       <div className="product-info">
-                        {product.image ? (
-                          <img src={product.image} alt={product.productName} className="product-img" />
-                        ) : (
-                          <div className="product-img-placeholder"></div>
-                        )}
+                        <img 
+                          src={product.image ? `http://localhost:5000/uploads/${product.image}` : "https://via.placeholder.com/45?text=No+Image"} 
+                          alt={product.productName} 
+                          className="product-img" 
+                          style={{ width: "35px", height: "35px", objectFit: "cover", borderRadius: "4px", marginRight: "10px" }}
+                        />
                         <span>{product.productName}</span>
                       </div>
                     </td>

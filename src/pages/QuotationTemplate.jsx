@@ -16,7 +16,7 @@ function QuotationTemplate() {
       const response = await fetch(API_URL);
       if (response.ok) {
         const result = await response.json();
-        console.log("Backend se aaya poora data:", result);
+        console.log("data ia comming from backend:", result);
 
         
         const allData = result.data || result.quotations || result;
@@ -26,7 +26,7 @@ function QuotationTemplate() {
           const templatesOnly = allData.filter((item) => item.saveAsTemplate === true);
           setSavedTemplates(templatesOnly);
         } else {
-          console.error("Backend se array nahi mila:", allData);
+          console.error("no error:", allData);
           setSavedTemplates([]);
         }
       } else {

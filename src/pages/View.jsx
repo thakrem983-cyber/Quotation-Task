@@ -48,7 +48,7 @@ function View() {
       setFormData({
         quotationType: backendData.quotationType || "GST",
         quotationNumber: backendData.quotationNumber || "",
-        quotationName: "",
+        quotationName:   backendData.quotationName||"",
         date: new Date(backendData.createdAt).toISOString().split("T")[0], 
         title: "MR", 
         clientName: backendData.clientName || "",
@@ -56,14 +56,22 @@ function View() {
       });
 
     
+      // 🟢 Is naye code se replace karein:
       const mappedProducts = backendData.products.map((p, index) => ({
         id: index + 1,
         productName: p.productName,
-        code: "", 
+        
+        // 1. Code ab backend se aayega
+        code: p.code || p.productCode || "-", 
+        
         unit: p.unit || "Nos",
         price: p.price,
         quantity: p.quantity,
         amount: p.total,
+        
+        // 2. Image ab backend se aayegi
+        image: p.image && p.image !== "null" ? p.image : null, 
+        
         isEditing: false, 
       }));
       setProducts(mappedProducts);

@@ -54,8 +54,18 @@ function ProductSection({
       },
     ]);
   };
-  const deleteProduct = (id) => {
-    const updatedProducts = products.filter((product) => product.id !== id);
+const deleteProduct = (deleteId) => {
+   
+    if (!deleteId) {
+      console.log("id is not found");
+      return; 
+    }
+
+    
+    const updatedProducts = products.filter(
+      (product) => product.id !== deleteId && product._id !== deleteId
+    );
+    
     setProducts(updatedProducts);
   };
   const editProduct = (id) => {

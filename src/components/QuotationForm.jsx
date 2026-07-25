@@ -73,7 +73,7 @@ function QuotationForm({
               disabled={isView}
             >
               <option value="GST">GST</option>
-              <option value="Cash">Cash</option>
+              <option value="CASH">CASH</option>
             </select>
 
             <input
