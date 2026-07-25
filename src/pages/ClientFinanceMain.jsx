@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaPlus,
@@ -9,54 +9,46 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import "./ClientFinanceMain.css";
+import api from "../api/api";
 
 function ClientFinanceMain() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
-  const financeData = [
-    {
-      id: 1,
-      clientName: "Ms. Tanuja Mondhe",
-      financeId: "CF-ME202627-032",
-      project: "AnkHub",
-      status: "Partially",
-      total: "₹1,39,240",
-      received: "₹1,180",
-      due: "₹1,38,060",
-    },
-    {
-      id: 2,
-      clientName: "Mr. Vanshika Gour",
-      financeId: "CF-ME202627-031",
-      project: "Sumit Cyber",
-      status: "Partially",
-      total: "₹1,24,020",
-      received: "₹10,000",
-      due: "₹1,14,020",
-    },
-    {
-      id: 3,
-      clientName: "Mr. Rahul Sharma",
-      financeId: "CF-MECH202627-007",
-      project: "AnkHub85",
-      status: "Partially",
-      total: "₹20,000",
-      received: "₹1,000",
-      due: "₹19,000",
-    },
-  ];
 
+
+const [financeData, setFinanceData] = useState([]);
+
+useEffect(() => {
+  fetchFinance();
+}, []);
+
+const fetchFinance = async () => {
+  try {
+    const res = await api.get("/client-finance/approved-quotations");
+
+    console.log(res.data);
+
+    setFinanceData(res.data);
+  } catch (err) {
+    console.error(err);
+  }
+};
   // --- Search Logic Added Here ---
   // Ye function check karega ki search field mein jo likha hai,
   // wo Client Name ya Finance ID mein match kar raha hai ya nahi.
-  const filteredData = financeData.filter((item) => {
-    return (
-      item.clientName.toLowerCase().includes(search.toLowerCase()) ||
-      item.financeId.toLowerCase().includes(search.toLowerCase())
-    );
-  });
-
+  //updated this too
+  const filteredData = (financeData || []).filter((item) => {
+  return (
+    (item.clientName || "")
+      .toLowerCase()
+      .includes(search.toLowerCase()) ||
+    (item.financeId || "")
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+});
+console.log(financeData);
   return (
     <div
       className="container-fluid py-4"
@@ -228,7 +220,7 @@ function ClientFinanceMain() {
                   </tr>
                 ) : (
                   filteredData.map((item) => (
-                    <tr key={item.id}>
+                    <tr key={item._id}>
                       <td className="ps-3 border-bottom-0 py-3">
                         <input
                           className="form-check-input shadow-none"

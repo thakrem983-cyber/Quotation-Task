@@ -1,87 +1,66 @@
-.modal-content{
-    border-radius:15px;
-    border:none;
+.modal-content {
+  border-radius: 15px;
+  border: none;
 }
 
-.dbt-modal-header{
-    border-bottom:1px solid #ececec;
-    padding:18px 24px;
+.dbt-modal-header {
+  border-bottom: 1px solid #ececec;
+  padding: 18px 24px;
 }
 
-.modal-title{
-    font-size:32px;
-    font-weight:600;
+.modal-title {
+  font-size: 32px;
+  font-weight: 600;
 }
 
-.modal-body{
-    padding:25px;
+.modal-body {
+  padding: 25px;
 }
 
-.form-label{
-    font-weight:500;
-    color:#333;
+.form-label {
+  font-weight: 500;
+  color: #333;
 }
 
 .form-control,
-.form-select{
-    height:50px;
-    border-radius:8px;
-    border:1px solid #d9d9d9;
-    box-shadow:none;
+.form-select {
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  box-shadow: none;
 }
 
 .form-control:focus,
-.form-select:focus{
-    border-color:#ff9800;
-    box-shadow:none;
+.form-select:focus {
+  border-color: #ff9800;
+  box-shadow: none;
 }
 
-.date-wrapper{
-    display:flex;
-}
-
-.date-wrapper .form-control{
-    border-top-right-radius:0;
-    border-bottom-right-radius:0;
-}
-
-.calendar-btn{
-    width:48px;
-    border:none;
-    background:#ff9800;
-    color:white;
-    border-radius:0 8px 8px 0;
-}
-
-.modal-footer{
-    border-top:1px solid #ececec;
-    padding:18px 25px;
-}
-
-.modal-footer .btn{
-    width:110px;
-    height:45px;
-    border-radius:8px;
-}
-
-.dbt-add-btn{
-    background:#ff9800;
-    border:none;
-}
-
-.dbt-add-btn:hover{
-    background:#f57c00;
-}
+/* --- DATE WRAPPER & CALENDAR FIX --- */
 .date-wrapper {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
+.date-wrapper .form-control {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  padding-right: 60px; /* Right button ke liye jagah banane ke liye */
+}
+
+/* Browser ke default icon ko poore input par overlay + invisible kar diya */
 .date-wrapper input[type="date"]::-webkit-calendar-picker-indicator {
-  opacity: 0;
   position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
   height: 100%;
+  opacity: 0;
   cursor: pointer;
+  z-index: 2; /* Orange button ke upar rakha taaki click karne par calendar khule */
 }
 
 .calendar-btn {
@@ -94,5 +73,31 @@
   background: #ff9800;
   color: #fff;
   border-radius: 0 8px 8px 0;
-  pointer-events: none; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+/* --- FOOTER BUTTONS --- */
+.modal-footer {
+  border-top: 1px solid #ececec;
+  padding: 18px 25px;
+}
+
+.modal-footer .btn {
+  width: 110px;
+  height: 45px;
+  border-radius: 8px;
+}
+
+.dbt-add-btn {
+  background: #ff9800;
+  border: none;
+  color: #fff;
+}
+
+.dbt-add-btn:hover {
+  background: #f57c00;
+  color: #fff;
 }
