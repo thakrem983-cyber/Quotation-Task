@@ -14,6 +14,7 @@ function ProductTable({
     const { name, value, files } = e.target;
 
     const updatedProducts = products.map((product) => {
+      
       if (product.id === id) {
         const updatedProduct = {
           ...product,
@@ -65,23 +66,25 @@ function ProductTable({
                         style={{ cursor: "pointer" }}
                       >
                         {/* 🔴 Grey dabbe ko hata kar proper default image laga di gayi hai */}
-                        <img
-                          src={
-                            // Agar image ka data hai
-                            product.image && product.image !== "null"
-                              ? product.image.startsWith("http")
-                                ? product.image // Agar Cloudinary/S3 ka full URL hai, toh direct wahi dikhao
-                                : `http://localhost:5000/${product.image}` // 🔴 YAHAN PORT CHECK KAREIN (Agar backend 8000 pe hai, to 8000 karein)
-                              : "https://via.placeholder.com/45?text=No+Img" // Agar image nahi hai toh placeholder dikhao
-                          }
-                          alt="Product"
-                          style={{
-                            width: "45px",
-                            height: "45px",
-                            borderRadius: "8px",
-                            objectFit: "cover",
-                          }}
-                        />
+                     <img
+  src={
+    product.image && product.image !== "null"
+      ? product.image
+      : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45'%3E%3Crect width='45' height='45' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23333333'%3ENo Img%3C/text%3E%3C/svg%3E"
+  }
+  alt="Product"
+  style={{
+    width: "45px",
+    height: "45px",
+    borderRadius: "8px",
+    objectFit: "cover",
+  }}
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src =
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45'%3E%3Crect width='45' height='45' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23333333'%3ENo Img%3C/text%3E%3C/svg%3E";
+  }}
+/>
                       </label>
 
                       <input
@@ -101,23 +104,25 @@ function ProductTable({
                     </div>
                   ) : (
                     // 🔴 Yahan bhi grey dabbe ko hata kar default image laga di gayi hai
-                    <img
-                      src={
-                        // Agar image ka data hai
-                        product.image && product.image !== "null"
-                          ? product.image.startsWith("http")
-                            ? product.image // Agar Cloudinary/S3 ka full URL hai, toh direct wahi dikhao
-                            : `http://localhost:5000/${product.image}` // 🔴 YAHAN PORT CHECK KAREIN (Agar backend 8000 pe hai, to 8000 karein)
-                          : "https://via.placeholder.com/45?text=No+Img" // Agar image nahi hai toh placeholder dikhao
-                      }
-                      alt="Product"
-                      style={{
-                        width: "45px",
-                        height: "45px",
-                        borderRadius: "8px",
-                        objectFit: "cover",
-                      }}
-                    />
+                  <img
+  src={
+    product.image && product.image !== "null"
+      ? product.image
+      : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45'%3E%3Crect width='45' height='45' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23333333'%3ENo Img%3C/text%3E%3C/svg%3E"
+  }
+  alt="Product"
+  style={{
+    width: "45px",
+    height: "45px",
+    borderRadius: "8px",
+    objectFit: "cover",
+  }}
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src =
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45'%3E%3Crect width='45' height='45' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23333333'%3ENo Img%3C/text%3E%3C/svg%3E";
+  }}
+/>
                   )}
                 </td>
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// 👇 1. Yahan useParams import kiya hai
+import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaPlus, FaTrash } from "react-icons/fa";
 import { Country, State, City } from "country-state-city";
-
 
 import AddProductItems from "../modal/AddProductItems";
 import CustomerService from "../modal/CustomerService";
@@ -11,9 +11,13 @@ import AddCreditModal from "../modal/AddCreditModal";
 import AddDebitModal from "../modal/AddDebitModal";
 import AddService from "../modal/AddService"; 
 
+// 👇 2. Tera API file import karna zaroori hai (Path check kar lena)
+import api from "../api/api";
+
 function EditClientFinance() {
   const navigate = useNavigate();
-
+  // 👇 3. URL se ID nikal li
+  const { id } = useParams(); 
 
   const [quotationType, setQuotationType] = useState("GST");
   const [quotationNo, setQuotationNo] = useState("");
@@ -36,29 +40,76 @@ function EditClientFinance() {
 
   const [productMode, setProductMode] = useState(null);
 
-
   const [products, setProducts] = useState([]);
   const [credits, setCredits] = useState([]);
   const [debits, setDebits] = useState([]);
 
-  
   const [showProductModal, setShowProductModal] = useState(false);
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [showTankyModal, setShowTankyModal] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
   const [showDebitModal, setShowDebitModal] = useState(false);
-  
- 
   const [showAddServiceModal, setShowAddServiceModal] = useState(false);
 
- 
+  // 👇 PAGE LOAD HOTE HI BACKEND SE DATA LAANA
+  useEffect(() => {
+    const fetchFinanceData = async () => {
+      try {
+        const response = await api.get(`/client-finance/${id}`);
+        const data = response.data;
+        
+        // 🚀 BROWSER CONSOLE MEIN CHECK KARNE KE LIYE (F12 daba kar dekhna)
+        console.log("BACKEND SE YEH DATA AAYA HAI:", data); 
+        
+        // --- 1. NORMAL FIELDS MAPPING ---
+        if (data.quotationType) setQuotationType(data.quotationType);
+        if (data.clientName) setClientName(data.clientName);
+        
+        // Agar backend mein keys alag hain, toh hum dono check kar lenge (Fail-safe)
+        setPhone(data.phone || data.mobile || data.phoneNumber || "");
+        setEmail(data.email || data.clientEmail || "");
+        setAddress(data.address || data.clientAddress || "");
+        setPincode(data.pincode || data.pinCode || data.zipCode || "");
+        setProject(data.project || data.projectName || "");
+        
+        if (data.gstin) setGstin(data.gstin);
+        if (data.subject) setSubject(data.subject);
+        if (data.notes) setNotes(data.notes);
+        
+        // --- 2. 🚀 PRODUCT TABLE FIX (NAAM AUR CODE DIKHANE KE LIYE) ---
+        if (data.products && data.products.length > 0) {
+          const formattedProducts = data.products.map((item) => ({
+            ...item, 
+            image: item.image || null,
+            // Backend se productName aata hai, par frontend 'name' dhundhta hai
+            name: item.productName || item.name || item.service || "-", 
+            code: item.code || item.productCode || "-",
+            unit: item.unit || "-",
+            price: Number(item.price) || 0,
+            quantity: Number(item.quantity) || item.qty || 1, 
+          }));
+          setProducts(formattedProducts);
+        }
+
+        if (data.credits) setCredits(data.credits);
+        if (data.debits) setDebits(data.debits);
+
+      } catch (error) {
+        console.error("Error fetching finance data:", error);
+      }
+    };
+
+    if (id) {
+      fetchFinanceData();
+    }
+  }, [id]);
+
   useEffect(() => {
     if (products.length === 0) {
       setProductMode(null);
     }
   }, [products]);
 
-  
   const handleModalSetProducts = (updatedProducts) => {
     const formattedProducts = updatedProducts.map((item) => ({
       ...item, 
@@ -76,7 +127,6 @@ function EditClientFinance() {
     setProducts(products.filter((_, i) => i !== index));
   };
 
-  
   const productsTotal = products.reduce((acc, curr) => acc + curr.quantity * curr.price, 0);
 
   const [discountPct, setDiscountPct] = useState("");
@@ -95,12 +145,11 @@ function EditClientFinance() {
   const totalDebits = debits.reduce((acc, curr) => acc + Number(curr.amount), 0);
   const profit = totalCredits - totalDebits;
 
-  
   const orangeBtnStyle = { backgroundColor: "#f58c22", color: "white", border: "none" };
   const orangeOutlineBtnStyle = { backgroundColor: "transparent", color: "#f58c22", border: "1px solid #f58c22" };
 
- 
-  const handleCreate = () => {
+  // 👇 5. UPDATE API CALL KARNA (PUT API)
+  const handleUpdate = async () => {
     if (clientName.trim() === "") {
       alert("Client Name is required.");
       return;
@@ -126,7 +175,32 @@ function EditClientFinance() {
       return;
     }
 
-    alert("Client Finance Created Successfully!");
+    // Backend bhejane ke liye updated data object banaya
+    const updatedData = {
+      quotationType,
+      clientName,
+      phone,
+      email,
+      address,
+      gstin,
+      subject,
+      notes,
+      products,
+      discount: discountAmt,
+      cgst: cgstAmt,
+      sgst: sgstAmt,
+      other: otherAmt,
+      grandTotal: finalTotalAmount
+    };
+
+    try {
+      await api.put(`/client-finance/${id}`, updatedData);
+      alert("Client Finance Updated Successfully!");
+      navigate(-1); // Update hone ke baad pichle page par bhej dega
+    } catch (error) {
+      console.error("Update Error:", error);
+      alert("Failed to update data.");
+    }
   };
 
   return (
@@ -142,7 +216,8 @@ function EditClientFinance() {
           <label className="form-label fw-bold">Quotation No <span className="text-danger">*</span></label>
           <div className="input-group">
             <select className="form-select" style={{ maxWidth: "80px" }} value={quotationType} onChange={(e) => setQuotationType(e.target.value)}>
-              <option>GST</option><option>CASH</option>
+              <option value="GST">GST</option>
+              <option value="CASH">CASH</option>
             </select>
             <select className="form-select" value={quotationNo} onChange={(e) => setQuotationNo(e.target.value)}>
               <option value="">Select quotation</option>
@@ -207,7 +282,6 @@ function EditClientFinance() {
           />
         </div>
 
-     
         <div className="col-md-4">
           <label className="form-label fw-bold">Country</label>
           <select className="form-select shadow-none" value={selectedCountry} onChange={(e) => { setSelectedCountry(e.target.value); setSelectedState(""); setSelectedCity(""); }}>
@@ -248,7 +322,6 @@ function EditClientFinance() {
         </div>
       </div>
 
-      
       <div className="mb-5">
         <h5 className="fw-bold mb-3">Products <span className="text-danger">*</span></h5>
         <div className="table-responsive mb-3">
@@ -288,7 +361,6 @@ function EditClientFinance() {
           </table>
         </div>
 
-        
         <div className="row g-4">
           <div className="col-md-7 d-flex gap-2 align-items-start">
             <button className="btn btn-light border fw-bold text-dark d-flex align-items-center" disabled={productMode === "tanky"} onClick={() => { setProductMode("standard"); setShowProductModal(true); }}>
@@ -358,7 +430,6 @@ function EditClientFinance() {
         </div>
       </div>
 
-     
       <div className="mb-4">
         <h5 className="fw-bold mb-3">Total Credits</h5>
         <div className="table-responsive mb-3">
@@ -375,7 +446,21 @@ function EditClientFinance() {
               </tr>
             </thead>
             <tbody>
-              <tr><td colSpan="7" className="text-center py-3 text-muted fw-bold">No credits added yet.</td></tr>
+              {credits.length === 0 ? (
+                <tr><td colSpan="7" className="text-center py-3 text-muted fw-bold">No credits added yet.</td></tr>
+              ) : (
+                credits.map((c, i) => (
+                  <tr key={i}>
+                    <td className="px-3"><input type="checkbox" className="form-check-input" /></td>
+                    <td>{new Date(c.date).toLocaleDateString()}</td>
+                    <td>₹{c.amount}</td>
+                    <td>{c.name || "-"}</td>
+                    <td>{c.paymentMode || "-"}</td>
+                    <td>{c.transactionId || "-"}</td>
+                    <td className="text-center">-</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -384,7 +469,6 @@ function EditClientFinance() {
         </button>
       </div>
 
-      
       <div className="mb-5">
         <h5 className="fw-bold mb-3">Total Debits</h5>
         <div className="table-responsive mb-3">
@@ -403,7 +487,23 @@ function EditClientFinance() {
               </tr>
             </thead>
             <tbody>
-              <tr><td colSpan="9" className="text-center py-3 text-muted fw-bold">No debits added yet.</td></tr>
+              {debits.length === 0 ? (
+                <tr><td colSpan="9" className="text-center py-3 text-muted fw-bold">No debits added yet.</td></tr>
+              ) : (
+                debits.map((d, i) => (
+                  <tr key={i}>
+                    <td className="px-3"><input type="checkbox" className="form-check-input" /></td>
+                    <td>{new Date(d.date).toLocaleDateString()}</td>
+                    <td>{d.purpose || "-"}</td>
+                    <td>₹{d.amount}</td>
+                    <td>{d.paidBy || "-"}</td>
+                    <td>{d.beneficiaryName || "-"}</td>
+                    <td>{d.paymentMode || "-"}</td>
+                    <td>{d.transactionId || "-"}</td>
+                    <td className="text-center">-</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -424,12 +524,12 @@ function EditClientFinance() {
 
       <div className="d-flex justify-content-end gap-3 mt-4 mb-5">
         <button className="btn px-5 fw-bold" style={orangeOutlineBtnStyle} onClick={() => navigate(-1)}>Cancel</button>
-        <button className="btn px-5 fw-bold" style={orangeBtnStyle} onClick={handleCreate}>
-          Create
+        {/* 👇 6. Update Button yahan laga diya */}
+        <button className="btn px-5 fw-bold" style={orangeBtnStyle} onClick={handleUpdate}>
+          Update Changes
         </button>
       </div>
 
-      
       {showProductModal && (
         <AddProductItems 
           closeModal={() => setShowProductModal(false)} 
@@ -451,14 +551,10 @@ function EditClientFinance() {
           closeModal={() => setShowTankyModal(false)} 
           products={products} 
           setProducts={handleModalSetProducts} 
-          openAddService={() => {
-            
-            setShowAddServiceModal(true); 
-          }} 
+          openAddService={() => setShowAddServiceModal(true)} 
         />
       )}
 
-      
       {showAddServiceModal && (
         <AddService 
           closeModal={() => setShowAddServiceModal(false)} 

@@ -71,9 +71,10 @@ const fetchQuotationDetails = async () => {
         isEditing: false, 
         
         image: p.image && p.image !== "null" ? p.image : null,
+        
       }));
       setProducts(mappedProducts);
-
+     
       setSummary({
         discount: backendData.discount || 0,
         cgst: backendData.cgst || 0,

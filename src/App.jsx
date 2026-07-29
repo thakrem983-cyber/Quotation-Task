@@ -215,8 +215,7 @@ function App() {
 
       <Route path="/client-finance" element={<ClientFinance />} />
 
-      <Route path="/edit-client-finance" element={<EditClientFinance />} />
-
+      <Route path="/edit-client-finance/:id" element={<EditClientFinance />} />
       <Route path="/view-client-finance" element={<ViewClientFinance />} />
 
       <Route path="/client-finance-main" element={<ClientFinanceMain />} />

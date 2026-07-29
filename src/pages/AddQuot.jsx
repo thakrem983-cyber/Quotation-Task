@@ -122,13 +122,13 @@ function AddQuot({
         console.log(`Uploading ${uploadedFiles.length} files to backend...`);
         for (let i = 0; i < uploadedFiles.length; i++) {
           const formPayload = new FormData();
+          
           formPayload.append("attachment", uploadedFiles[i]);
 
           try {
-            await api.post(`/upload/${newQuotationId}`, formPayload, {
-              headers: {
-                "Content-Type": "multipart/form-data", 
-              },
+            // YAHAN DHYAN DEIN: api.post likha hai, router nahi!
+            await api.post(`/upload/quotation/${newQuotationId}`, formPayload, {
+              headers: { "Content-Type": "multipart/form-data" },
             });
             console.log(`File ${i + 1} uploaded successfully!`);
           } catch (uploadError) {

@@ -188,10 +188,10 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
                       <div className="product-info">
                         <img
                           src={
-                            product.image
-                              ? `http://localhost:5000/uploads/${product.image}`
-                              : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45'%3E%3Crect width='45' height='45' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23333333'%3ENo Img%3C/text%3E%3C/svg%3E"
-                          }
+    product.image 
+      ? product.image 
+      : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45'%3E%3Crect width='45' height='45' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23333333'%3ENo Img%3C/text%3E%3C/svg%3E"
+  }
                           alt={product.productName}
                           className="product-img"
                           style={{

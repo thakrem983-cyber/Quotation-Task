@@ -50,9 +50,7 @@ function ClientFinanceMain() {
       return;
     }
 
-    if (
-      window.confirm("you are sure data is deleted")
-    ) {
+    if (window.confirm("you are sure data is deleted")) {
       try {
         // Backend Delete Request Call
         await api.delete(`/client-finance/${deleteId}`);
@@ -246,13 +244,6 @@ function ClientFinanceMain() {
                   </tr>
                 ) : (
                   filteredData.map((item, index) => {
-                    // 📌 STEP 1: Yahan backend se aane wali possible keys ko check kar rahe hain
-                    // const projectName =
-                    //   item.project ||
-                    //   item.projectName ||
-                    //   item.projectTitle ||
-                    //   item.title ||
-                    //   "-";
                     const projectName =
                       item.project ||
                       item.projectName ||
@@ -295,20 +286,10 @@ function ClientFinanceMain() {
                           />
                         </td>
 
-                        {/* Client Name */}
                         <td className="border-bottom-0 py-3 text-dark fw-medium">
                           {item.clientName || item.client?.name || "-"}
                         </td>
 
-                        {/* Finance ID / Quotation ID */}
-                        {/* <td className="border-bottom-0 py-3 text-muted">
-                          {item.quotationId ||
-                            item.quotationNo ||
-                            item.financeId ||
-                            item._id ||
-                            "-"}
-                        </td> */}
-                        {/* Finance ID Column */}
                         <td className="border-bottom-0 py-3 text-muted fw-medium">
                           {item.financeId ||
                             item.financeNo ||
@@ -381,20 +362,29 @@ function ClientFinanceMain() {
                               onClick={() => navigate("/view-client-finance")}
                             />
                             <FaEdit
-                              style={{
-                                color: "#fbc02d",
-                                cursor: "pointer",
-                                fontSize: "16px",
-                              }}
-                              onClick={() => navigate("/edit-client-finance")}
-                            />
+  style={{
+    color: "#fbc02d",
+    cursor: "pointer",
+    fontSize: "16px",
+  }}
+  onClick={() => {
+   
+    const editId = item.financeId || item.customFinanceId;
+
+    if (!editId) {
+      alert("Bhai, is client ka abhi tak Finance record create nahi hua hai! Pehle Add Client Finance se create karo.");
+      return;
+    }
+
+    navigate(`/edit-client-finance/${editId}`);
+  }}
+/>
                             <FaTrash
                               style={{
                                 color: "#e53935",
                                 cursor: "pointer",
                                 fontSize: "16px",
                               }}
-                              /* 👈 Yahan 'item._id' ki jagah poora 'item' pass karein */
                               onClick={() => handleDelete(item)}
                             />
                           </div>

@@ -308,21 +308,6 @@ function Quotation() {
         )}
 
         {showApproveModal && (
-          // <ApproveQuotation
-          //   closeModal={() => setShowApproveModal(false)}
-          //   quotationId={approveId}
-          //   quotationNumber={users.find(u => u.id === approveId)?.quotation}
-
-          //   onApprove={() => {
-
-          //     setUsers((prevUsers) =>
-          //       prevUsers.map((user) =>
-          //         user.id === approveId ? { ...user, status: "Approved" } : user
-          //       )
-          //     );
-
-          //   }}
-          // />
           <ApproveQuotation
             closeModal={() => setShowApproveModal(false)}
             quotation={users.find((u) => u.id === approveId)}
