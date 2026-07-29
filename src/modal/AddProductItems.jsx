@@ -4,7 +4,6 @@ import { FaSearch } from "react-icons/fa";
 import api from "../api/api";
 
 function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
-
   const [backendProducts, setBackendProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,10 +11,8 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
   const [search, setSearch] = useState("");
   const [selectAll, setSelectAll] = useState(false);
 
-
   const [checkedRows, setCheckedRows] = useState({});
   const [quantities, setQuantities] = useState({});
-
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -23,6 +20,9 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
         const response = await api.get("/products");
 
         const data = response.data.data || response.data || [];
+        //***********
+        console.log("Products Data:", data);
+        console.log("First Product Image:", data[0]?.image);
         setBackendProducts(data);
         setLoading(false);
       } catch (error) {
@@ -34,7 +34,6 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
     fetchProducts();
   }, []);
 
-
   const filteredProducts = backendProducts.filter((product) => {
     const matchesSearch =
       product.productName.toLowerCase().includes(search.toLowerCase()) ||
@@ -42,10 +41,11 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
 
     const categoryString = Array.isArray(product.category)
       ? product.category.join(", ")
-      : (product.category || "");
+      : product.category || "";
 
     const matchesCategory =
-      category === "" || categoryString.toLowerCase().includes(category.toLowerCase());
+      category === "" ||
+      categoryString.toLowerCase().includes(category.toLowerCase());
 
     return matchesSearch && matchesCategory;
   });
@@ -138,7 +138,9 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
 
         <div className="table-container">
           {loading ? (
-            <p style={{ textAlign: "center", padding: "20px" }}>Loading products from backend...</p>
+            <p style={{ textAlign: "center", padding: "20px" }}>
+              Loading products from backend...
+            </p>
           ) : (
             <table className="product-table">
               <thead>
@@ -160,7 +162,6 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
               </thead>
 
               <tbody>
-
                 {filteredProducts.map((product) => (
                   <tr key={product._id}>
                     <td>
@@ -177,22 +178,34 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
 
                           setQuantities((prev) => ({
                             ...prev,
-                            [product._id]: checked
-                              ? (prev[product._id] || 1) 
-                              : 0,                       
+                            [product._id]: checked ? prev[product._id] || 1 : 0,
                           }));
                         }}
                       />
                     </td>
 
-                  
                     <td>
                       <div className="product-info">
-                        <img 
-                          src={product.image ? `http://localhost:5000/uploads/${product.image}` : "https://via.placeholder.com/45?text=No+Image"} 
-                          alt={product.productName} 
-                          className="product-img" 
-                          style={{ width: "35px", height: "35px", objectFit: "cover", borderRadius: "4px", marginRight: "10px" }}
+                        <img
+                          src={
+                            product.image
+                              ? `http://localhost:5000/uploads/${product.image}`
+                              : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45'%3E%3Crect width='45' height='45' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23333333'%3ENo Img%3C/text%3E%3C/svg%3E"
+                          }
+                          alt={product.productName}
+                          className="product-img"
+                          style={{
+                            width: "35px",
+                            height: "35px",
+                            objectFit: "cover",
+                            borderRadius: "4px",
+                            marginRight: "10px",
+                          }}
+                          onError={(e) => {
+                            e.target.onerror = null; // Infinite loop block karega
+                            e.target.src =
+                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='45' height='45'%3E%3Crect width='45' height='45' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%23333333'%3ENo Img%3C/text%3E%3C/svg%3E";
+                          }}
                         />
                         <span>{product.productName}</span>
                       </div>
@@ -238,7 +251,10 @@ function AddProductItems({ closeModal, products: mainProducts, setProducts }) {
 
                 {filteredProducts.length === 0 && (
                   <tr>
-                    <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
+                    <td
+                      colSpan="7"
+                      style={{ textAlign: "center", padding: "20px" }}
+                    >
                       No products found.
                     </td>
                   </tr>

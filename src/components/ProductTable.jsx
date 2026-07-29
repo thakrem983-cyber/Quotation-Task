@@ -65,23 +65,23 @@ function ProductTable({
                         style={{ cursor: "pointer" }}
                       >
                         {/* 🔴 Grey dabbe ko hata kar proper default image laga di gayi hai */}
-                       <img
-  src={
-    // Agar image ka data hai
-    product.image && product.image !== "null"
-      ? product.image.startsWith("http")
-        ? product.image // Agar Cloudinary/S3 ka full URL hai, toh direct wahi dikhao
-        : `http://localhost:5000/${product.image}` // 🔴 YAHAN PORT CHECK KAREIN (Agar backend 8000 pe hai, to 8000 karein)
-      : "https://via.placeholder.com/45?text=No+Img" // Agar image nahi hai toh placeholder dikhao
-  }
-  alt="Product"
-  style={{
-    width: "45px",
-    height: "45px",
-    borderRadius: "8px",
-    objectFit: "cover",
-  }}
-/>
+                        <img
+                          src={
+                            // Agar image ka data hai
+                            product.image && product.image !== "null"
+                              ? product.image.startsWith("http")
+                                ? product.image // Agar Cloudinary/S3 ka full URL hai, toh direct wahi dikhao
+                                : `http://localhost:5000/${product.image}` // 🔴 YAHAN PORT CHECK KAREIN (Agar backend 8000 pe hai, to 8000 karein)
+                              : "https://via.placeholder.com/45?text=No+Img" // Agar image nahi hai toh placeholder dikhao
+                          }
+                          alt="Product"
+                          style={{
+                            width: "45px",
+                            height: "45px",
+                            borderRadius: "8px",
+                            objectFit: "cover",
+                          }}
+                        />
                       </label>
 
                       <input
@@ -102,22 +102,22 @@ function ProductTable({
                   ) : (
                     // 🔴 Yahan bhi grey dabbe ko hata kar default image laga di gayi hai
                     <img
-  src={
-    // Agar image ka data hai
-    product.image && product.image !== "null"
-      ? product.image.startsWith("http")
-        ? product.image // Agar Cloudinary/S3 ka full URL hai, toh direct wahi dikhao
-        : `http://localhost:5000/${product.image}` // 🔴 YAHAN PORT CHECK KAREIN (Agar backend 8000 pe hai, to 8000 karein)
-      : "https://via.placeholder.com/45?text=No+Img" // Agar image nahi hai toh placeholder dikhao
-  }
-  alt="Product"
-  style={{
-    width: "45px",
-    height: "45px",
-    borderRadius: "8px",
-    objectFit: "cover",
-  }}
-/>
+                      src={
+                        // Agar image ka data hai
+                        product.image && product.image !== "null"
+                          ? product.image.startsWith("http")
+                            ? product.image // Agar Cloudinary/S3 ka full URL hai, toh direct wahi dikhao
+                            : `http://localhost:5000/${product.image}` // 🔴 YAHAN PORT CHECK KAREIN (Agar backend 8000 pe hai, to 8000 karein)
+                          : "https://via.placeholder.com/45?text=No+Img" // Agar image nahi hai toh placeholder dikhao
+                      }
+                      alt="Product"
+                      style={{
+                        width: "45px",
+                        height: "45px",
+                        borderRadius: "8px",
+                        objectFit: "cover",
+                      }}
+                    />
                   )}
                 </td>
 

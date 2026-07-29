@@ -51,7 +51,7 @@ function ClientFinanceMain() {
     }
 
     if (
-      window.confirm("Kya aap sach me is record ko delete karna chahte hain?")
+      window.confirm("you are sure data is deleted")
     ) {
       try {
         // Backend Delete Request Call
@@ -62,7 +62,7 @@ function ClientFinanceMain() {
           prevData.filter((i) => (i._id || i.financeId) !== deleteId),
         );
 
-        alert("Record successfully delete ho gaya!");
+        alert("Record successfully delete");
       } catch (err) {
         console.error("Delete Error:", err.response?.data || err.message);
 
@@ -71,7 +71,7 @@ function ClientFinanceMain() {
         setFinanceData((prevData) =>
           prevData.filter((i) => (i._id || i.financeId) !== deleteId),
         );
-        alert("Record UI se remove kar diya gaya hai.");
+        alert("Record UI data is remove.");
       }
     }
   };

@@ -221,11 +221,17 @@ function AddTankyProduct({
                         src={
                           item.image
                             ? `http://localhost:5000/uploads/${item.image}`
-                            : "https://via.placeholder.com/35"
+                            : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='35' height='35'%3E%3Crect width='35' height='35' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='8' fill='%23333333'%3ENo Img%3C/text%3E%3C/svg%3E"
                         }
                         alt={item.name}
                         width={35}
                         height={35}
+                        style={{ objectFit: "cover", borderRadius: "4px" }}
+                        onError={(e) => {
+                          e.target.onerror = null; // Infinite loop rokne ke liye
+                          e.target.src =
+                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='35' height='35'%3E%3Crect width='35' height='35' fill='%23cccccc'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='8' fill='%23333333'%3ENo Img%3C/text%3E%3C/svg%3E";
+                        }}
                       />
 
                       <span>{item.name}</span>
